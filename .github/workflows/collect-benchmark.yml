@@ -111,7 +111,9 @@ jobs:
           scan_osv yargs https://github.com/yargs/yargs b2dbcc538062829bd720f8cbfb6b4765bae6b4b8 "$GITHUB_WORKSPACE/targets/yargs/package-lock.json"
       - name: Generate union candidate manifest
         run: npm run build:candidates -- --reports-dir "$GITHUB_WORKSPACE/research/scan-reports" --external-reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/benchmark-candidates.csv"
-      - name: Upload scan reports and unlabeled candidates
+      - name: Generate OSV-Scanner CVSS baseline scores
+        run: npm run build:osv-scores -- --candidates "$GITHUB_WORKSPACE/research/benchmark-candidates.csv" --reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/osv-scanner-scores.csv"
+      - name: Upload scan reports, baseline scores, and unlabeled candidates
         uses: actions/upload-artifact@v4
         with:
           name: pathguard-public-benchmark-candidates
@@ -119,5 +121,6 @@ jobs:
             research/scan-reports/*.json
             research/osv-scanner-reports/*
             research/benchmark-candidates.csv
+            research/osv-scanner-scores.csv
           if-no-files-found: error
           retention-days: 30
