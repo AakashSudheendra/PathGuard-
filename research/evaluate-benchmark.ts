@@ -17,7 +17,7 @@ interface Finding {
   vulnerability: { id?: string; aliases?: string[]; severity?: Array<{score?: string}>; epssByCve?: Array<{cve: string; score: {score: number} | null}> };
   ranking?: { cvssBaseScore: number | null; epssProbability: number | null; priorityScore: number; formulaVersion: string };
 }
-interface ScanReport { findings: Finding[]; generatedAt?: string; tool?: {name?: string; version?: string}; input?: { repositoryUrl?: string; repositoryCommit?: string }; }
+interface ScanReport { schemaVersion?: string; findings: Finding[]; generatedAt?: string; tool?: {name?: string; version?: string}; input?: { repositoryUrl?: string; repositoryCommit?: string }; }
 interface CaseResult { caseId: string; label: Exclude<Label, "unknown">; scores: Record<string, number>; }
 interface MetricResult {
   method: string;
@@ -197,6 +197,7 @@ async function main() {
   }
   for (const entry of reportEntries) {
     const report = entry.report;
+    if (report.schemaVersion !== "1.1") throw new Error(`Scan report ${entry.path} uses schema ${report.schemaVersion ?? "unknown"}; regenerate it with PathGuard report schema 1.1.`);
     if (!Array.isArray(report.findings)) throw new Error(`Scan report ${entry.path} does not contain a findings array.`);
     if (!report.input?.repositoryUrl || !report.input.repositoryCommit) {
       throw new Error(`Scan report ${entry.path} lacks repositoryUrl/repositoryCommit metadata. Rescan with --repo-url and --commit.`);
