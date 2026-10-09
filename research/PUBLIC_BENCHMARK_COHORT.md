@@ -2,7 +2,7 @@
 
 **Status:** collection seed only; not yet a labeled benchmark and not claimed to be representative.
 
-The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans the root `package-lock.json` and a bounded source directory for each repository below. Full immutable commit hashes are pinned in the workflow and passed into each PathGuard report. The cohort was selected for a reproducible npm lockfile and a conventional source directory; this is a convenience sample, so any paper must discuss selection bias and broaden it before making general claims.
+The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans the root `package-lock.json` and a bounded source directory for each repository below. Full immutable commit hashes are pinned in the workflow and passed into each PathGuard report. The workflow checks out each repository's named branch and verifies that its HEAD equals the pinned SHA before scanning; it fails closed if a branch has moved, rather than silently scanning a different revision. The cohort was selected for a reproducible npm lockfile and a conventional source directory; this is a convenience sample, so any paper must discuss selection bias and broaden it before making general claims.
 
 | Repository | Pinned commit | Source directory | Lockfile |
 |---|---|---|---|
