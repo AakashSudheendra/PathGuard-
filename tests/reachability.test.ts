@@ -34,6 +34,12 @@ test("detects CommonJS require and ignores local imports", async () => withProje
   assert.ok(!evidence.some((x) => x.packageName === "./local.js"));
 }));
 
+test("filters call references to packages not present in the lockfile", async () => withProject(async (root) => {
+  await writeFile(join(root, "app.ts"), 'import * as ts from "typescript";\nts.createSourceFile("x.ts", "", ts.ScriptTarget.Latest);\n');
+  const evidence = await analyzeSourceUsage(root, new Set(["lodash"]));
+  assert.equal(evidence.length, 0);
+}));
+
 test("summary never overstates runtime reachability", () => {
   assert.equal(summarizeSourceEvidence([{ packageName: "x", file: "a.ts", line: 1, evidenceType: "static-import", reachabilityStatus: "not-proven" }]).reachabilityProvenCount, 0);
 });
