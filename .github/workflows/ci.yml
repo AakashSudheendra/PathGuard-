@@ -13,6 +13,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm install
+      - name: Export generated lockfile for synchronization
+        if: contains(github.event.head_commit.message, '[sync-lockfile]')
+        run: |
+          echo PATHGUARD_LOCKFILE_START
+          cat package-lock.json
+          echo PATHGUARD_LOCKFILE_END
       - run: npm run build
       - run: npm test
       - run: npm run evaluate:benchmark -- --reports-dir research/fixtures/scan-reports --labels research/fixtures/sample-labels.csv --external-ranking research/fixtures/sample-external-scores.csv --external-name synthetic-external --out /tmp/pathguard-benchmark-metrics.json --k 2
