@@ -53,7 +53,7 @@ This analysis is not a whole-program call graph. It does not comprehensively res
 
 ### 3.3 Advisory-to-symbol evidence
 
-The prototype contains four manually curated lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744, each with an NVD reference and rationale [5]–[8]. A match means that a detected call reference matches a reviewed symbol hint for the advisory. No matching evidence is not proof of non-reachability; no mapping means the symbol-level status is unknown. Expand mappings only with a cited reference, rationale, and review record.
+The prototype currently contains seven provisional advisory-to-symbol mappings: four lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744, plus three @fastify/busboy mappings for CVE-2026-19484, CVE-2026-19481, and CVE-2026-74866. Each mapping includes an NVD reference and rationale. The Busboy mappings treat the default-import parser invocation as an entry-point hint; the advisory-specific vulnerable branches and downstream conditions are not proven. A match means that a detected call reference matches a provisional symbol hint, not that runtime reachability or exploitability is established. These mappings require independent review before being used as benchmark ground truth.
 
 ### 3.4 PathGuard v1 score
 
@@ -74,7 +74,7 @@ The formula is versioned as `pathguard-v1`. Missing CVSS or EPSS values remain n
 
 ### 4.1 Case selection
 
-Select public repositories and vulnerable package/version cases using inclusion criteria fixed before looking at PathGuard rankings. Pin every repository to an immutable commit. Avoid selecting cases solely because the prototype already detects them. Deduplicate cases by repository commit, ecosystem, package/version, and advisory identifier.
+The initial reproducible seed cohort comprises seven public npm repositories with pinned commits: Axios, Undici, npm CLI, Marked, Yargs, Node-RED, and Parse Server. It is a convenience sample selected for root npm lockfiles and inspectable source directories, not a representative sample of npm applications. The collection workflow runs PathGuard and OSV-Scanner v2.6.0 against the same pinned lockfiles and forms a union of detected cases. Broaden the cohort and disclose selection bias before making general claims. Select public repositories and vulnerable package/version cases using inclusion criteria fixed before looking at PathGuard rankings. Pin every repository to an immutable commit. Avoid selecting cases solely because the prototype already detects them. Deduplicate cases by repository commit, ecosystem, package/version, and advisory identifier.
 
 ### 4.2 Independent labels
 
