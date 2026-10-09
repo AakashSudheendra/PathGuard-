@@ -12,17 +12,20 @@ This checklist distinguishes software completion from evidence needed to support
 - [x] Versioned, explainable `pathguard-v1` ranking factors.
 - [x] Benchmark evaluator for CVSS-only, EPSS-only, PathGuard, and optional external scores.
 - [x] Label validation for unique IDs, identifiers, allowed labels, and reviewer disagreement notes.
-- [x] Deterministic unlabeled candidate-manifest generator for real scan reports.
-- [x] CI build, unit tests, and synthetic evaluator/candidate-generator smoke tests.
+- [x] Deterministic unlabeled candidate-manifest generator that merges PathGuard and OSV-Scanner discoveries.
+- [x] Blinded independent-review packet generator that omits system scores and source-analysis outputs.
+- [x] Reviewer/adjudication merge tool with distinct-reviewer, complete-case, and disagreement-note validation.
+- [x] Pinned seven-repository collection workflow with checksum-verified OSV-Scanner baseline and reproducibility manifest.
+- [x] CI build, unit tests, evaluator/candidate/review-packet/label-merge smoke tests.
 - [x] Research protocol and manuscript draft with explicit placeholders.
 
 ## Empirical work required before submission
 
 - [ ] Define and freeze case-selection criteria before examining final rankings.
-- [ ] Curate a sufficiently large, diverse set of public npm repositories and pinned commits.
+- [ ] Expand the seven-repository convenience seed into a sufficiently large, diverse public npm application cohort and document selection bias.
 - [ ] Generate candidate cases from real scans and manually verify the package/advisory/function mapping.
 - [ ] Expand advisory-to-symbol mappings using cited sources and independent review.
-- [ ] Independently label cases as `reachable`, `not_reachable`, or `unknown`; preserve both reviewers' labels and adjudication rationale.
+- [ ] Complete both blinded reviewer CSVs and adjudication template; independently label cases as `reachable`, `not_reachable`, or `unknown`, preserving raw decisions and adjudication rationale.
 - [ ] Run PathGuard and preserve scan reports, warnings, API retrieval dates, tool commit, Node/npm versions, and EPSS dates.
 - [ ] Run CVSS-only and EPSS-only baselines on the same cases.
 - [ ] Run at least one established scanner baseline with pinned version/configuration and documented case matching.
