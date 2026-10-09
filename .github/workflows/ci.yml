@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm install
+      - run: npm ci
       - run: npm run build
       - run: npm test
       - run: npm run evaluate:benchmark -- --report research/fixtures/sample-report.json --labels research/fixtures/sample-labels.csv --external-ranking research/fixtures/sample-external-scores.csv --external-name synthetic-external --out /tmp/pathguard-benchmark-metrics.json --k 2
