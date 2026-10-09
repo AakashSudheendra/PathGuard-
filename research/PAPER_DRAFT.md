@@ -53,7 +53,7 @@ This analysis is not a whole-program call graph. It does not comprehensively res
 
 ### 3.3 Advisory-to-symbol evidence
 
-The prototype contains four manually curated lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744, each with an NVD reference and rationale. A match means that a detected call reference matches a reviewed symbol hint for the advisory. No matching evidence is not proof of non-reachability; no mapping means the symbol-level status is unknown. Expand mappings only with a cited reference, rationale, and review record.
+The prototype contains four manually curated lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744, each with an NVD reference and rationale [5]–[8]. A match means that a detected call reference matches a reviewed symbol hint for the advisory. No matching evidence is not proof of non-reachability; no mapping means the symbol-level status is unknown. Expand mappings only with a cited reference, rationale, and review record.
 
 ### 3.4 PathGuard v1 score
 
@@ -141,6 +141,12 @@ PathGuard is an inspectable prototype for combining dependency vulnerability dat
 [4] FIRST, “Exploit Prediction Scoring System (EPSS),” official documentation and API resources. [https://www.first.org/epss/](https://www.first.org/epss/).
 
 [5] National Vulnerability Database, “CVE-2021-23337 Detail.” [https://nvd.nist.gov/vuln/detail/CVE-2021-23337](https://nvd.nist.gov/vuln/detail/CVE-2021-23337).
+
+[6] National Vulnerability Database, “CVE-2020-8203 Detail.” [https://nvd.nist.gov/vuln/detail/CVE-2020-8203](https://nvd.nist.gov/vuln/detail/CVE-2020-8203).
+
+[7] National Vulnerability Database, “CVE-2020-28500 Detail.” [https://nvd.nist.gov/vuln/detail/CVE-2020-28500](https://nvd.nist.gov/vuln/detail/CVE-2020-28500).
+
+[8] National Vulnerability Database, “CVE-2019-10744 Detail.” [https://nvd.nist.gov/vuln/detail/CVE-2019-10744](https://nvd.nist.gov/vuln/detail/CVE-2019-10744).
 
 ## Artifact availability
 
