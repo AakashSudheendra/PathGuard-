@@ -16,3 +16,4 @@ jobs:
       - run: npm run build
       - run: npm test
       - run: npm run evaluate:benchmark -- --report research/fixtures/sample-report.json --labels research/fixtures/sample-labels.csv --out /tmp/pathguard-benchmark-metrics.json --k 2
+      - run: node -e "const r=JSON.parse(require('fs').readFileSync('/tmp/pathguard-benchmark-metrics.json','utf8')); if(r.coverage.labelRows!==4 || r.coverage.matchedRows!==3 || r.coverage.unmatchedRows!==1 || r.metrics.some(m=>m.evaluatedCases!==3)) throw new Error('Benchmark evaluator smoke assertions failed');"
