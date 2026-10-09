@@ -15,14 +15,14 @@ This checklist distinguishes software completion from evidence needed to support
 - [x] Deterministic unlabeled candidate-manifest generator that merges PathGuard and OSV-Scanner discoveries.
 - [x] Blinded independent-review packet generator that omits system scores and source-analysis outputs.
 - [x] Reviewer/adjudication merge tool with distinct-reviewer, complete-case, and disagreement-note validation.
-- [x] Pinned nine-repository collection workflow with checksum-verified OSV-Scanner baseline and reproducibility manifest; expanded scan must complete and be checked.
+- [x] Pinned nine-repository collection completed with checksum-verified OSV-Scanner baseline, immutable commit verification, and reproducibility manifest.
 - [x] CI build, unit tests, evaluator/candidate/review-packet/label-merge smoke tests.
 - [x] Research protocol and manuscript draft with explicit placeholders.
 
 ## Empirical work required before submission
 
 - [ ] Define and freeze case-selection criteria before examining final rankings.
-- [ ] Expand the original seven-repository convenience seed to nine pinned repositories (Socket.IO and NestJS added); assess whether this is sufficiently large and diverse, continue cohort expansion if needed, and document selection bias.
+- [ ] [EXPANDED] Nine pinned repositories are now collected (8,659 dependency entries, 427 unique unlabeled cases). Still assess whether the cohort is sufficiently large and diverse, continue expansion if justified, and document selection bias.
 - [ ] Generate candidate cases from real scans and manually verify the package/advisory/function mapping.
 - [ ] Expand advisory-to-symbol mappings using cited sources and independent review.
 - [ ] Complete both blinded reviewer CSVs and adjudication template; independently label cases as `reachable`, `not_reachable`, or `unknown`, preserving raw decisions and adjudication rationale.
