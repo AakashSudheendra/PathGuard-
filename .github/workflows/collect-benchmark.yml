@@ -71,14 +71,18 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/research/osv-scanner-reports"
           curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 -o /tmp/osv-scanner
           curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_SHA256SUMS -o /tmp/osv-scanner_SHA256SUMS
-          grep 'osv-scanner_linux_amd64
-      - name: Scan Undici
+          grep 'osv-scanner_linux_amd64$' /tmp/osv-scanner_SHA256SUMS | (cd /tmp && sha256sum -c -)
+          chmod +x /tmp/osv-scanner
+          /tmp/osv-scanner --version | tee "$GITHUB_WORKSPACE/research/osv-scanner-reports/tool-version.txt"
+      - name: Scan Axios with PathGuard
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/axios/package-lock.json" --source "$GITHUB_WORKSPACE/targets/axios/lib" --repo-url "https://github.com/axios/axios" --commit "1a94bdbdf0518f3adbeada510b747aff80847ed7" --out "$GITHUB_WORKSPACE/research/scan-reports/axios.json" --limit 2000
+      - name: Scan Undici with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/undici/package-lock.json" --source "$GITHUB_WORKSPACE/targets/undici/lib" --repo-url "https://github.com/nodejs/undici" --commit "e960331c83346ce770a7a58d7cfb6afb4aec0ccf" --out "$GITHUB_WORKSPACE/research/scan-reports/undici.json" --limit 2000
-      - name: Scan npm CLI
+      - name: Scan npm CLI with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/npm-cli/package-lock.json" --source "$GITHUB_WORKSPACE/targets/npm-cli/lib" --repo-url "https://github.com/npm/cli" --commit "b317f16c80df02ea3628cfa77170d5ae9b59720c" --out "$GITHUB_WORKSPACE/research/scan-reports/npm-cli.json" --limit 2000
-      - name: Scan Marked
+      - name: Scan Marked with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/marked/package-lock.json" --source "$GITHUB_WORKSPACE/targets/marked/src" --repo-url "https://github.com/markedjs/marked" --commit "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c" --out "$GITHUB_WORKSPACE/research/scan-reports/marked.json" --limit 2000
-      - name: Scan Yargs
+      - name: Scan Yargs with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/yargs/package-lock.json" --source "$GITHUB_WORKSPACE/targets/yargs/lib" --repo-url "https://github.com/yargs/yargs" --commit "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8" --out "$GITHUB_WORKSPACE/research/scan-reports/yargs.json" --limit 2000
       - name: Run OSV-Scanner baseline on pinned lockfiles
         shell: bash
@@ -114,30 +118,6 @@ jobs:
           path: |
             research/scan-reports/*.json
             research/osv-scanner-reports/*
-            research/benchmark-candidates.csv
-          if-no-files-found: error
-          retention-days: 30
- /tmp/osv-scanner_SHA256SUMS | (cd /tmp && sha256sum -c -)
-          chmod +x /tmp/osv-scanner
-          /tmp/osv-scanner --version | tee "$GITHUB_WORKSPACE/research/osv-scanner-reports/tool-version.txt"
-      - name: Scan Axios
-        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/axios/package-lock.json" --source "$GITHUB_WORKSPACE/targets/axios/lib" --repo-url "https://github.com/axios/axios" --commit "1a94bdbdf0518f3adbeada510b747aff80847ed7" --out "$GITHUB_WORKSPACE/research/scan-reports/axios.json" --limit 2000
-      - name: Scan Undici
-        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/undici/package-lock.json" --source "$GITHUB_WORKSPACE/targets/undici/lib" --repo-url "https://github.com/nodejs/undici" --commit "e960331c83346ce770a7a58d7cfb6afb4aec0ccf" --out "$GITHUB_WORKSPACE/research/scan-reports/undici.json" --limit 2000
-      - name: Scan npm CLI
-        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/npm-cli/package-lock.json" --source "$GITHUB_WORKSPACE/targets/npm-cli/lib" --repo-url "https://github.com/npm/cli" --commit "b317f16c80df02ea3628cfa77170d5ae9b59720c" --out "$GITHUB_WORKSPACE/research/scan-reports/npm-cli.json" --limit 2000
-      - name: Scan Marked
-        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/marked/package-lock.json" --source "$GITHUB_WORKSPACE/targets/marked/src" --repo-url "https://github.com/markedjs/marked" --commit "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c" --out "$GITHUB_WORKSPACE/research/scan-reports/marked.json" --limit 2000
-      - name: Scan Yargs
-        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/yargs/package-lock.json" --source "$GITHUB_WORKSPACE/targets/yargs/lib" --repo-url "https://github.com/yargs/yargs" --commit "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8" --out "$GITHUB_WORKSPACE/research/scan-reports/yargs.json" --limit 2000
-      - name: Generate unlabeled candidate manifest
-        run: npm run build:candidates -- --reports-dir "$GITHUB_WORKSPACE/research/scan-reports" --out "$GITHUB_WORKSPACE/research/benchmark-candidates.csv"
-      - name: Upload scan reports and unlabeled candidates
-        uses: actions/upload-artifact@v4
-        with:
-          name: pathguard-public-benchmark-candidates
-          path: |
-            research/scan-reports/*.json
             research/benchmark-candidates.csv
           if-no-files-found: error
           retention-days: 30
