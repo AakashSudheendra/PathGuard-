@@ -20,7 +20,10 @@ interface ScanReport {
   sources: { osv: string; epss: string };
   summary: ReturnType<typeof summarizeFindings>;
   dependencies: LockedDependency[];
-  findings: Array<PackageFinding & {
+  findings: Array<{
+    name: string;
+    version: string;
+    vulnerability: ReturnType<typeof attachEpssScores>[number];
     epss: Array<{ cve: string; score: EpssScore | null }>;
     maxEpssScore: number | null;
   }>;
