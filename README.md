@@ -52,7 +52,9 @@ The output path is relative to the current directory unless you provide an absol
 
 - `apps/scanner`: TypeScript command-line scanner.
 - `tests`: unit tests and a small, intentionally vulnerable lockfile fixture.
-- `research`: benchmark protocol, label template, and experiment guidance.
+- `research`: benchmark evaluator, label template, experiment guidance, and manuscript draft.
+- `research/PAPER_DRAFT.md`: research manuscript draft; empirical results are intentionally placeholders until independently labeled experiments are completed.
+- `docs/BENCHMARK_PROTOCOL.md`: case selection, independent labels, baselines, metrics, and reproducibility protocol.
 - `docs`: architecture and research limitations.
 
 ## Research protocol
