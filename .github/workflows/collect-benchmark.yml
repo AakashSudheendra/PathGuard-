@@ -135,6 +135,10 @@ jobs:
         run: npm run build:candidates -- --reports-dir "$GITHUB_WORKSPACE/research/scan-reports" --external-reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/benchmark-candidates.csv"
       - name: Generate OSV-Scanner CVSS baseline scores
         run: npm run build:osv-scores -- --candidates "$GITHUB_WORKSPACE/research/benchmark-candidates.csv" --reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/osv-scanner-scores.csv"
+      - name: Validate candidate review artifact
+        shell: bash
+        run: |
+          node -e 'const fs=require("fs"); const m=JSON.parse(fs.readFileSync("research/experiment-manifest.json","utf8")); const c=fs.readFileSync("research/benchmark-candidates.csv","utf8"); const s=fs.readFileSync("research/osv-scanner-scores.csv","utf8"); if(Object.keys(m.repositoryCommits||{}).length!==7 || m.labelStatus!=="unreviewed; no ground-truth labels assigned" || !c.startsWith("case_id,repository_url,commit_sha") || !c.includes("advisory_summary,advisory_references") || !c.includes("discovery_source") || !s.startsWith("case_id,score,flagged")) throw new Error("Benchmark review artifact validation failed");'
       - name: Write reproducibility manifest
         shell: bash
         run: |
