@@ -17,7 +17,8 @@ PathGuard analyzes npm lockfiles, enriches findings with OSV advisory data and E
 - [x] Versioned explainable `pathguard-v1` ranking and CVSS v3.x vector parsing
 - [x] Benchmark evaluator for CVSS-only, EPSS-only, PathGuard, and optional external ranking scores
 - [x] Repository/commit-specific matching, label validation, coverage reporting, and ranking metrics
-- [x] CI build, unit tests, and synthetic evaluator smoke test
+- [x] Unlabeled benchmark-candidate manifest generator
+- [x] CI build, unit tests, and synthetic evaluator/candidate-generator smoke tests
 
 ### Not yet implemented or validated
 - [ ] Whole-program, language-aware call graph or runtime reachability analysis
@@ -25,7 +26,7 @@ PathGuard analyzes npm lockfiles, enriches findings with OSV advisory data and E
 - [ ] Real independently labeled benchmark and comparative evaluation
 - [ ] Dashboard
 
-The CI benchmark data are synthetic fixtures used to test the evaluator only; they are not empirical evidence.
+The CI benchmark data are synthetic fixtures used to test the tooling only; they are not empirical evidence.
 
 ## Requirements
 
@@ -50,7 +51,7 @@ Scan a project containing `package-lock.json`:
 npm run scan -- --lockfile "C:\path\to\your\project\package-lock.json" --out "pathguard-results.json"
 ```
 
-For a reproducible benchmark scan, include the repository URL and the full 40-character commit SHA:
+For a reproducible benchmark scan, include the repository URL and full 40-character commit SHA:
 
 ```powershell
 npm run scan -- --lockfile "C:\path\to\project\package-lock.json" --repo-url "https://github.com/owner/repository" --commit "FULL_40_CHARACTER_COMMIT_SHA" --out ".\research\scan-reports\repository.json"
@@ -62,18 +63,26 @@ The output path is relative to the current directory unless you provide an absol
 
 - `apps/scanner`: TypeScript command-line scanner.
 - `tests`: unit tests and a small intentionally vulnerable lockfile fixture.
-- `research`: benchmark evaluator, label template, experiment guidance, and manuscript draft.
+- `research`: benchmark evaluator, candidate generator, label template, experiment guidance, and manuscript draft.
 - [Research manuscript draft](research/PAPER_DRAFT.md): empirical results remain placeholders until experiments are completed.
 - [Publication checklist](research/PUBLICATION_CHECKLIST.md): separates completed engineering from required empirical work.
 - [Benchmark protocol](docs/BENCHMARK_PROTOCOL.md): case selection, independent labels, baselines, metrics, and reproducibility.
 - [Research workspace](research/README.md): dataset and evaluation guidance.
 - [Research limitations](docs/RESEARCH_LIMITATIONS.md): scope and claims the current implementation cannot support.
 
+## Prepare benchmark candidates
+
+After producing real scan reports with repository URL and commit metadata, generate a candidate CSV for independent review:
+
+```powershell
+npm run build:candidates -- --reports-dir ".\research\scan-reports" --out ".\research\benchmark-candidates.csv"
+```
+
+This command creates one candidate row per package/version/advisory finding, with stable IDs and repository/commit identifiers. It deliberately leaves all labels blank. Reviewers must verify the advisory, vulnerable function, source evidence, and call path, then independently assign labels and record adjudication. Generated candidates are not ground truth and must not be passed to the evaluator until they have been reviewed and completed.
+
 ## Benchmark evaluation
 
-Save one scan JSON report per pinned repository commit in `research/scan-reports`. Use `--repo-url` and `--commit` during each scan so the evaluator joins cases by repository, immutable commit, package/version, and advisory identifiers.
-
-To evaluate independently reviewed labels and an external baseline:
+After review, evaluate the labeled CSV and optionally include an external baseline:
 
 ```powershell
 npm run evaluate:benchmark -- --reports-dir ".\research\scan-reports" --labels ".\research\labeled-cases.csv" --external-ranking ".\research\external-scores.csv" --external-name "OSV-Scanner" --out ".\research\metrics.json" --k 5
