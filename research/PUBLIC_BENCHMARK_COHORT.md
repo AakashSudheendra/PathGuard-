@@ -1,8 +1,8 @@
-# Initial public npm repository cohort
+# Expanded public npm repository cohort
 
-**Status:** collection seed only; not yet a labeled benchmark and not claimed to be representative.
+**Status:** expanded collection seed only; not yet a labeled benchmark and not claimed to be representative.
 
-The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans each repository's root `package-lock.json` and a bounded source directory. Full immutable commit hashes are pinned in the workflow and passed into each PathGuard report. The workflow checks out each repository's named branch and verifies that its HEAD equals the pinned SHA before scanning; it fails closed if a branch has moved, rather than silently scanning a different revision. This is a convenience sample selected for npm lockfiles and inspectable JavaScript/TypeScript source; any paper must discuss selection bias and broaden it before making general claims.
+The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans each repository's root `package-lock.json` and a bounded source directory. Full immutable commit hashes are pinned in the workflow and passed into each PathGuard report. The workflow checks out each repository's named branch and verifies that its HEAD equals the pinned SHA before scanning; it fails closed if a branch has moved, rather than silently scanning a different revision. This is a convenience sample selected for root npm lockfiles and inspectable JavaScript/TypeScript source; it spans libraries, developer tooling, and application/framework repositories. It is still not representative of all npm applications, and any paper must discuss selection bias.
 
 | Repository | Pinned commit | Source directory | Lockfile |
 |---|---|---|---|
@@ -13,6 +13,8 @@ The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans each
 | [yargs/yargs](https://github.com/yargs/yargs) | `b2dbcc538062829bd720f8cbfb6b4765bae6b4b8` | `lib` | root `package-lock.json` |
 | [node-red/node-red](https://github.com/node-red/node-red) | `935b8d3e12ec8be064f3a72ac6547131f778a7b1` | `packages` | root `package-lock.json` |
 | [parse-community/parse-server](https://github.com/parse-community/parse-server) | `304c1a5d4e752958c7c9b41425fe1ee546111fc6` | `src` | root `package-lock.json` |
+| [socketio/socket.io](https://github.com/socketio/socket.io) | `1eaa582d3b453e3e6f522300ed05b10da0a0799b` | `packages` | root `package-lock.json` |
+| [nestjs/nest](https://github.com/nestjs/nest) | `2731c18054fb348779311d81e4e20949e313be78` | `packages` | root `package-lock.json` |
 
 ## Reproduce collection
 
