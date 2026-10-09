@@ -24,8 +24,9 @@ Reviewers should use advisory references, source code at the pinned commit, depe
 
 1. **CVSS-only**: rank by CVSS base score. Missing scores are retained as missing in the scan report and receive zero only as the evaluator's explicit deterministic ordering fallback.
 2. **EPSS-only**: rank by the maximum EPSS probability among CVE aliases for the package/advisory case. Missing scores use the same documented fallback.
-3. **PathGuard v1**: rank by the versioned heuristic score in each report. The current score has a maximum of 100: CVSS contributes up to 35 points, EPSS probability up to 35, and source evidence up to 30. A curated vulnerable-symbol match contributes 30, a general static call reference 18, and import-only evidence 8. This is a research heuristic, not a calibrated probability.
-4. **Optional established scanner**: include OSV-Scanner or another tool when its version, command, configuration, and output can be preserved. Run it on the same pinned repositories and package/version cases. Do not compare on mismatched case sets without reporting the difference.
+3. **PathGuard v1**: rank by the versioned heuristic score in each report.
+4. **External scanner score**: optionally pass a complete `case_id,score` CSV using `--external-ranking` and `--external-name`. Higher scores rank first. Every label row must be present; use score zero for cases the external tool did not flag. This enables a common-case comparison, but the external score construction must be documented and must not be presented as an intrinsic scanner score if it was manually assigned. The current score has a maximum of 100: CVSS contributes up to 35 points, EPSS probability up to 35, and source evidence up to 30. A curated vulnerable-symbol match contributes 30, a general static call reference 18, and import-only evidence 8. This is a research heuristic, not a calibrated probability.
+5. **Optional established scanner**: include OSV-Scanner or another tool when its version, command, configuration, and output can be preserved. Run it on the same pinned repositories and package/version cases. Do not compare on mismatched case sets without reporting the difference.
 
 ## Metrics
 
