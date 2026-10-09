@@ -16,7 +16,7 @@ The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans each
 
 ## Reproduce collection
 
-Open the [Collect Public Benchmark Candidates workflow](https://github.com/AakashSudheendra/PathGuard-/actions/workflows/collect-benchmark.yml) and run **Run workflow**, or push a change to that workflow file. The workflow builds PathGuard, checks out each repository at its pinned commit, runs PathGuard and the checksum-verified OSV-Scanner v2.6.0 against the same lockfiles, merges cases discovered by either tool, and uploads raw scan reports, an unlabeled union candidate CSV, an OSV-Scanner CVSS baseline score CSV, and an experiment manifest as the `pathguard-public-benchmark-candidates` artifact.
+Open the [Collect Public Benchmark Candidates workflow](https://github.com/AakashSudheendra/PathGuard-/actions/workflows/collect-benchmark.yml) and run **Run workflow**, or push a change to that workflow file. The workflow builds PathGuard, checks out each repository at its pinned commit, runs PathGuard and the checksum-verified OSV-Scanner v2.6.0 against the same lockfiles, merges cases discovered by either tool, and uploads raw scan reports, an unlabeled union candidate CSV, an OSV-Scanner CVSS baseline score CSV, two blinded reviewer packets, review instructions, and an experiment manifest as the `pathguard-public-benchmark-candidates` artifact.
 
 The OSV-Scanner score CSV uses the maximum CVSS base score reported by OSV-Scanner for a matched advisory; cases not flagged receive score 0. This is a **detection-plus-severity baseline**, not an intrinsic priority score emitted by OSV-Scanner. Flagged cases without a parseable CVSS score also receive 0 and are identified in the CSV's `score_source` field. Report that limitation in any analysis.
 
