@@ -69,11 +69,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE/research/osv-scanner-reports"
-          curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 -o /tmp/osv-scanner
+          curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 -o /tmp/osv-scanner_linux_amd64
           curl -fsSL https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_SHA256SUMS -o /tmp/osv-scanner_SHA256SUMS
           grep 'osv-scanner_linux_amd64$' /tmp/osv-scanner_SHA256SUMS | (cd /tmp && sha256sum -c -)
           chmod +x /tmp/osv-scanner
-          /tmp/osv-scanner --version | tee "$GITHUB_WORKSPACE/research/osv-scanner-reports/tool-version.txt"
+          /tmp/osv-scanner_linux_amd64 --version | tee "$GITHUB_WORKSPACE/research/osv-scanner-reports/tool-version.txt"
       - name: Scan Axios with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/axios/package-lock.json" --source "$GITHUB_WORKSPACE/targets/axios/lib" --repo-url "https://github.com/axios/axios" --commit "1a94bdbdf0518f3adbeada510b747aff80847ed7" --out "$GITHUB_WORKSPACE/research/scan-reports/axios.json" --limit 2000
       - name: Scan Undici with PathGuard
@@ -94,7 +94,7 @@ jobs:
             local stderr_file="$GITHUB_WORKSPACE/research/osv-scanner-reports/$slug.stderr.log"
             local exit_code=0
             set +e
-            /tmp/osv-scanner scan --format json -L "$lockfile" > "$report" 2> "$stderr_file"
+            /tmp/osv-scanner_linux_amd64 scan --format json -L "$lockfile" > "$report" 2> "$stderr_file"
             exit_code=$?
             set -e
             if [ "$exit_code" -gt 1 ]; then
