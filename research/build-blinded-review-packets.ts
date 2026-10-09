@@ -61,13 +61,13 @@ The review packets intentionally omit PathGuard priority scores, CVSS/EPSS score
 
 ## Required label
 
-For each case, enter exactly one value in `reviewer_label`:
+For each case, enter exactly one value in reviewer_label:
 
-- `reachable`: source evidence and relevant configuration support a plausible path to the advisory's vulnerable function and its preconditions.
-- `not_reachable`: positive evidence supports that the vulnerable functionality cannot be reached in the evaluated configuration. Absence of an import or failed text search alone is insufficient.
-- `unknown`: the source path, vulnerable function, or relevant preconditions cannot be determined confidently.
+- reachable: source evidence and relevant configuration support a plausible path to the advisory's vulnerable function and its preconditions.
+- not_reachable: positive evidence supports that the vulnerable functionality cannot be reached in the evaluated configuration. Absence of an import or failed text search alone is insufficient.
+- unknown: the source path, vulnerable function, or relevant preconditions cannot be determined confidently.
 
-Record the vulnerable function and concise rationale in `vulnerable_function` and `review_notes`. Include file paths and line numbers at the pinned commit. Use advisory references in the row, and verify affected package versions independently.
+Record the vulnerable function and concise rationale in vulnerable_function and review_notes. Include file paths and line numbers at the pinned commit. Use advisory references in the row, and verify affected package versions independently.
 
 ## After independent review
 
