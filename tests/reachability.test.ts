@@ -36,4 +36,4 @@ test("detects CommonJS require and ignores local imports", async () => withProje
 
 test("summary never overstates runtime reachability", () => {
   assert.equal(summarizeSourceEvidence([{ packageName: "x", file: "a.ts", line: 1, evidenceType: "static-import", reachabilityStatus: "not-proven" }]).reachabilityProvenCount, 0);
-}));
+});
