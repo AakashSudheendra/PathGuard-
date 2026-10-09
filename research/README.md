@@ -34,4 +34,4 @@ The current prototype contains eight provisional mappings: four lodash mappings 
 
 ## Publication status
 
-The software pipeline and synthetic CI smoke test are implemented. The empirical work is not complete: real pinned repositories, independently reviewed labels, complete baseline outputs, measured results, and error analysis are still required. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [PAPER_DRAFT.md](PAPER_DRAFT.md).
+The software pipeline, pinned seven-repository seed scan, OSV-Scanner v2.6.0 baseline outputs, and synthetic CI smoke tests are implemented. The empirical work is not complete: the seed is a convenience sample, reviewer labels and adjudication are not filled, the final expanded cohort has not been frozen, and comparative metrics and error analysis have not been produced. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [PAPER_DRAFT.md](PAPER_DRAFT.md).
