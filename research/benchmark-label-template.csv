@@ -1,1 +1,1 @@
-case_id,repository_url,commit_sha,ecosystem,package_name,installed_version,osv_ids,cve_ids,vulnerable_function,source_evidence,label,reviewer_1,reviewer_2,disagreement_notes,source_date,epss_date,notes
+case_id,repository_url,commit_sha,ecosystem,package_name,installed_version,osv_ids,cve_ids,vulnerable_function,source_evidence,label,reviewer_1,reviewer_1_label,reviewer_2,reviewer_2_label,disagreement_notes,source_date,epss_date,notes
