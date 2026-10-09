@@ -53,7 +53,7 @@ This analysis is not a whole-program call graph. It does not comprehensively res
 
 ### 3.3 Advisory-to-symbol evidence
 
-The prototype currently contains seven provisional advisory-to-symbol mappings: four lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744 [5]–[8], plus three @fastify/busboy mappings for CVE-2026-19484, CVE-2026-19481, and CVE-2026-74866 [9]–[11]. Each mapping includes an NVD reference and rationale. The Busboy mappings treat the default-import parser invocation in Parse Server's multipart router at a pinned commit as an entry-point hint [12]; advisory-specific vulnerable branches and downstream conditions are not proven. A match means that a detected call reference matches a provisional symbol hint, not that runtime reachability or exploitability is established. These mappings require independent review before being used as benchmark ground truth.
+The prototype currently contains eight provisional advisory-to-symbol mappings: four lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744 [5]–[8], three @fastify/busboy mappings for CVE-2026-19484, CVE-2026-19481, and CVE-2026-74866 [9]–[11], and one @graphql-tools/utils mapping for CVE-2026-104852 [13]. Each mapping includes an advisory reference and rationale. The Busboy mappings treat the default-import parser invocation in Parse Server's multipart router at a pinned commit as an entry-point hint [12]; advisory-specific vulnerable branches and downstream conditions are not proven. A match means that a detected call reference matches a provisional symbol hint, not that runtime reachability or exploitability is established. These mappings require independent review before being used as benchmark ground truth.
 
 ### 3.4 PathGuard v1 score
 
@@ -155,6 +155,8 @@ PathGuard is an inspectable prototype for combining dependency vulnerability dat
 [11] National Vulnerability Database, “CVE-2026-74866 Detail.” [https://nvd.nist.gov/vuln/detail/CVE-2026-74866](https://nvd.nist.gov/vuln/detail/CVE-2026-74866).
 
 [12] Parse Server, `src/Routers/FunctionsRouter.js`, pinned commit `304c1a5d4e752958c7c9b41425fe1ee546111fc6`, line 220. [Source at pinned commit](https://github.com/parse-community/parse-server/blob/304c1a5d4e752958c7c9b41425fe1ee546111fc6/src/Routers/FunctionsRouter.js#L220).
+
+[13] National Vulnerability Database, “CVE-2026-104852 Detail.” [https://nvd.nist.gov/vuln/detail/CVE-2026-104852](https://nvd.nist.gov/vuln/detail/CVE-2026-104852).
 
 ## Artifact availability
 
