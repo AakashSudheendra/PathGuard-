@@ -84,11 +84,21 @@ async function main() {
   if (!candidateRows.length) throw new Error("Candidate manifest contains no cases.");
   const output: string[][] = [];
   let disagreements = 0;
+  let reviewer1Identity: string | undefined;
+  let reviewer2Identity: string | undefined;
   for (const candidate of candidateRows) {
     const id = candidate.case_id;
     const r1 = reviewer1Rows.get(id)!;
     const r2 = reviewer2Rows.get(id)!;
     const adj = adjudicationRows.get(id)!;
+    const reviewer1Name = (r1.reviewer_name ?? "").trim();
+    const reviewer2Name = (r2.reviewer_name ?? "").trim();
+    if (!reviewer1Name || !reviewer2Name) throw new Error(`Case ${id}: both reviewer names are required.`);
+    if (reviewer1Name.toLowerCase() === reviewer2Name.toLowerCase()) throw new Error(`Case ${id}: reviewers must be independent people with distinct names.`);
+    if (reviewer1Identity && reviewer1Identity !== reviewer1Name) throw new Error("Reviewer 1 identity must be consistent across all cases.");
+    if (reviewer2Identity && reviewer2Identity !== reviewer2Name) throw new Error("Reviewer 2 identity must be consistent across all cases.");
+    reviewer1Identity = reviewer1Name;
+    reviewer2Identity = reviewer2Name;
     const label1 = validLabel(r1.reviewer_label ?? "", `reviewer 1 case ${id}`);
     const label2 = validLabel(r2.reviewer_label ?? "", `reviewer 2 case ${id}`);
     const finalLabel = validLabel(adj.label ?? "", `adjudication case ${id}`);
@@ -100,9 +110,9 @@ async function main() {
     const row: Row = {
       ...candidate,
       label: finalLabel,
-      reviewer_1: (r1.reviewer_name ?? "").trim(),
+      reviewer_1: reviewer1Name,
       reviewer_1_label: label1,
-      reviewer_2: (r2.reviewer_name ?? "").trim(),
+      reviewer_2: reviewer2Name,
       reviewer_2_label: label2,
       disagreement_notes: note,
     };
