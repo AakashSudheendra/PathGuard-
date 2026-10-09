@@ -1,6 +1,6 @@
 # PathGuard
 
-**Reachability-aware and evidence-guided prioritization of third-party software vulnerabilities.**
+**Evidence-guided prioritization of npm dependency vulnerabilities.**
 
 PathGuard analyzes npm lockfiles, enriches findings with OSV advisory data and EPSS exploit-likelihood scores, and adds source-level evidence when dependencies appear to be used by application code. The research question is whether these signals improve triage over severity-only and exploitation-likelihood-only ranking; improvement has not yet been established.
 
