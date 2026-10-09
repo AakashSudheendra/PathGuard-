@@ -42,6 +42,8 @@ The evaluator excludes `unknown` from ranking metrics and reports it separately.
 
 ## Reproducibility
 
+For multi-repository runs, pass one report JSON per repository commit to the evaluator with `--reports-dir`. Each report must include `input.repositoryUrl` and `input.repositoryCommit`, recorded by passing `--repo-url` and a full `--commit` SHA to the scanner. The evaluator joins on both values as well as package version and vulnerability identifiers to avoid accidental cross-repository matches.
+
 For each run, preserve:
 
 - PathGuard commit SHA and Node/npm versions;
