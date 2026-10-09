@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "tool": {
+    "name": "PathGuard",
+    "version": "0.1.0"
+  },
+  "generatedAt": "2026-01-02T00:00:00.000Z",
+  "input": {
+    "repositoryUrl": "https://example.invalid/synthetic-repository-b",
+    "repositoryCommit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "findings": [
+    {
+      "name": "example-e",
+      "version": "5.0.0",
+      "vulnerability": {
+        "id": "GHSA-example-e",
+        "aliases": [
+          "CVE-2024-5555"
+        ],
+        "severity": [
+          {
+            "type": "CVSS_V3",
+            "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          }
+        ],
+        "epssByCve": [
+          {
+            "cve": "CVE-2024-5555",
+            "score": {
+              "cve": "CVE-2024-5555",
+              "score": 0.65,
+              "percentile": 0.95
+            }
+          }
+        ]
+      },
+      "ranking": {
+        "cvssBaseScore": 9.8,
+        "epssProbability": 0.65,
+        "priorityScore": 80.75,
+        "formulaVersion": "pathguard-v1"
+      }
+    }
+  ]
+}
