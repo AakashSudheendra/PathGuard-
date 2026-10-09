@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { readNpmLockfile, type LockedDependency } from "./lockfile.js";
 import { attachEpssScores, summarizeFindings, type EpssScore, type PackageFinding, type VulnerabilityRecord, type EnrichedVulnerability } from "./report.js";
 import { analyzeSourceUsage, summarizeSourceEvidence, type SourceEvidence } from "./reachability.js";
+import { assessVulnerableSymbolUsage, type SourceEvidenceAssessment } from "./vulnerability-evidence.js";
 
 const OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch";
 const OSV_VULN_URL = "https://api.osv.dev/v1/vulns/";
@@ -30,6 +31,7 @@ interface ScanReport {
     epss: Array<{ cve: string; score: EpssScore | null }>;
     maxEpssScore: number | null;
     sourceEvidence: SourceEvidence[];
+    sourceEvidenceAssessment: SourceEvidenceAssessment;
   }>;
   warnings: string[];
 }
@@ -179,7 +181,12 @@ async function run(): Promise<void> {
       vulnerability: vulnerability!,
       epss,
       maxEpssScore: presentScores.length ? Math.max(...presentScores) : null,
-      sourceEvidence: sourceEvidence.filter((item) => item.packageName === finding.name)
+      sourceEvidence: sourceEvidence.filter((item) => item.packageName === finding.name),
+      sourceEvidenceAssessment: assessVulnerableSymbolUsage(
+        finding.vulnerability,
+        finding.name,
+        sourceEvidence
+      )
     };
   });
 
