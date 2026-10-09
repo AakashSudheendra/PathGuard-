@@ -26,9 +26,11 @@ This checklist distinguishes software completion from evidence needed to support
 - [ ] Generate candidate cases from real scans and manually verify the package/advisory/function mapping.
 - [ ] Expand advisory-to-symbol mappings using cited sources and independent review.
 - [ ] Complete both blinded reviewer CSVs and adjudication template; independently label cases as `reachable`, `not_reachable`, or `unknown`, preserving raw decisions and adjudication rationale.
-- [ ] Run PathGuard and preserve scan reports, warnings, API retrieval dates, tool commit, Node/npm versions, and EPSS dates.
+- [x] Collect initial seed-cohort PathGuard reports with pinned repository commits and API warning records.
+- [ ] Run PathGuard on the final expanded, frozen, independently labeled cohort and archive reports, warnings, retrieval dates, tool commit, Node/npm versions, and EPSS dates.
 - [ ] Run CVSS-only and EPSS-only baselines on the same cases.
-- [ ] Run at least one established scanner baseline with pinned version/configuration and documented case matching.
+- [x] Run OSV-Scanner v2.6.0 on the initial seed cohort and preserve raw JSON outputs plus a documented CVSS-based score export.
+- [ ] Re-run the established scanner baseline on the final independently labeled cohort with pinned version/configuration and documented case matching.
 - [ ] Create complete external ranking score CSVs with explicit zero scores for cases not flagged by the external tool.
 - [ ] Evaluate using predeclared k values and metrics; report coverage, precision@k, recall@k, nDCG@k, uncertainty intervals where justified, runtime, and API failures.
 - [ ] Conduct error analysis, including cases where PathGuard ranks a non-reachable case above a reachable case.
