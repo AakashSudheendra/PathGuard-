@@ -16,7 +16,7 @@ interface OsvBatchResponse { results?: OsvBatchResult[]; }
 interface OsvVulnerability extends VulnerabilityRecord { id: string; }
 
 interface ScanReport {
-  schemaVersion: "1.0";
+  schemaVersion: "1.1";
   tool: { name: "PathGuard"; version: "0.1.0" };
   generatedAt: string;
   input: { lockfile: string; sourceRoot: string; ecosystem: "npm"; repositoryUrl?: string; repositoryCommit?: string };
@@ -216,7 +216,7 @@ async function run(): Promise<void> {
     a.name.localeCompare(b.name) || a.version.localeCompare(b.version));
 
   const report: ScanReport = {
-    schemaVersion: "1.0",
+    schemaVersion: "1.1",
     tool: { name: "PathGuard", version: "0.1.0" },
     generatedAt: new Date().toISOString(),
     input: { lockfile: args.lockfile, sourceRoot: args.sourceRoot, ecosystem: "npm", ...(args.repositoryUrl && { repositoryUrl: args.repositoryUrl }), ...(args.repositoryCommit && { repositoryCommit: args.repositoryCommit }) },
