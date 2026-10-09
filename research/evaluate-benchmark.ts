@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 type Label = "reachable" | "not_reachable" | "unknown";
@@ -17,7 +17,7 @@ interface Finding {
   vulnerability: { id?: string; aliases?: string[]; severity?: Array<{score?: string}>; epssByCve?: Array<{cve: string; score: {score: number} | null}> };
   ranking?: { cvssBaseScore: number | null; epssProbability: number | null; priorityScore: number; formulaVersion: string };
 }
-interface ScanReport { findings: Finding[]; generatedAt?: string; tool?: {name?: string; version?: string}; }
+interface ScanReport { findings: Finding[]; generatedAt?: string; tool?: {name?: string; version?: string}; input?: { repositoryUrl?: string; repositoryCommit?: string }; }
 interface CaseResult { caseId: string; label: Exclude<Label, "unknown">; scores: Record<string, number>; }
 interface MetricResult {
   method: string;
@@ -50,7 +50,7 @@ function parseCsv(text: string): string[][] {
 function parseLabels(text: string): LabelRow[] {
   const rows = parseCsv(text);
   const headers = rows.shift()?.map((x) => x.trim()) ?? [];
-  const required = ["case_id", "package_name", "installed_version", "osv_ids", "cve_ids", "label"];
+  const required = ["case_id", "repository_url", "commit_sha", "package_name", "installed_version", "osv_ids", "cve_ids", "label"];
   for (const name of required) if (!headers.includes(name)) throw new Error(`Labels CSV missing required column: ${name}`);
   const seenCaseIds = new Set<string>();
   return rows.map((values, index) => {
@@ -101,7 +101,7 @@ function parseExternalScores(text: string, labels: LabelRow[]): Map<string, numb
   if (missing.length) throw new Error(`External ranking CSV must include every labeled case, using score 0 for cases not flagged by the external tool. Missing: ${missing.slice(0, 10).join(", ")}`);
   return scores;
 }
-function scoreFor(label: LabelRow, findings: Finding[]): CaseResult | null {
+function scoreFor(label: LabelRow, reports: ScanReport[]): CaseResult | null {
   const wanted = new Set([...ids(label.osv_ids), ...ids(label.cve_ids)]);
   if (!wanted.size) return null;
   const matches = findings.filter((finding) =>
@@ -174,29 +174,46 @@ function parseArgs(argv: string[]) {
   if (args["external-name"] && !args["external-ranking"]) throw new Error("--external-name requires --external-ranking.");
   const k = args.k === undefined ? 5 : Number(args.k);
   if (!Number.isInteger(k) || k < 1) throw new Error("--k must be a positive integer.");
-  return {report:resolve(args.report),labels:resolve(args.labels),out:args.out ? resolve(args.out) : undefined,k,externalRanking:args["external-ranking"] ? resolve(args["external-ranking"]) : undefined,externalName:args["external-name"] ?? "external-baseline"};
+  return {report:args.report ? resolve(args.report) : undefined,reportsDir:args["reports-dir"] ? resolve(args["reports-dir"]) : undefined,labels:resolve(args.labels),out:args.out ? resolve(args.out) : undefined,k,externalRanking:args["external-ranking"] ? resolve(args["external-ranking"]) : undefined,externalName:args["external-name"] ?? "external-baseline"};
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const report = JSON.parse(await readFile(args.report,"utf8")) as ScanReport;
-  if (!Array.isArray(report.findings)) throw new Error("Scan report does not contain a findings array.");
-  const missingRanking = report.findings.filter((finding) =>
-    !finding.ranking ||
-    typeof finding.ranking.priorityScore !== "number" ||
-    typeof finding.ranking.cvssBaseScore === "undefined" ||
-    typeof finding.ranking.epssProbability === "undefined"
-  );
-  if (missingRanking.length) {
-    throw new Error("Scan report lacks PathGuard ranking fields. Regenerate it with a current PathGuard version before evaluating.");
+  let reportEntries: Array<{path: string; report: ScanReport}>;
+  if (args.reportsDir) {
+    const names = (await readdir(args.reportsDir)).filter((name) => name.toLowerCase().endsWith(".json")).sort();
+    if (!names.length) throw new Error(`No JSON scan reports found in ${args.reportsDir}`);
+    reportEntries = await Promise.all(names.map(async (name) => ({
+      path: resolve(args.reportsDir!, name),
+      report: JSON.parse(await readFile(resolve(args.reportsDir!, name),"utf8")) as ScanReport
+    })));
+  } else {
+    reportEntries = [{path: args.report!, report: JSON.parse(await readFile(args.report!,"utf8")) as ScanReport}];
   }
+  for (const entry of reportEntries) {
+    const report = entry.report;
+    if (!Array.isArray(report.findings)) throw new Error(`Scan report ${entry.path} does not contain a findings array.`);
+    if (!report.input?.repositoryUrl || !report.input.repositoryCommit) {
+      throw new Error(`Scan report ${entry.path} lacks repositoryUrl/repositoryCommit metadata. Rescan with --repo-url and --commit.`);
+    }
+    const missingRanking = report.findings.filter((finding) =>
+      !finding.ranking ||
+      typeof finding.ranking.priorityScore !== "number" ||
+      typeof finding.ranking.cvssBaseScore === "undefined" ||
+      typeof finding.ranking.epssProbability === "undefined"
+    );
+    if (missingRanking.length) {
+      throw new Error(`Scan report ${entry.path} lacks PathGuard ranking fields. Regenerate it with a current PathGuard version before evaluating.`);
+    }
+  }
+  const reports = reportEntries.map((entry) => entry.report);
   const labels = parseLabels(await readFile(args.labels,"utf8"));
   const externalScores = args.externalRanking
     ? parseExternalScores(await readFile(args.externalRanking,"utf8"), labels)
     : null;
   const externalName = args.externalName;
   const results = labels.map((label) => {
-    const result = scoreFor(label, report.findings ?? []);
+    const result = scoreFor(label, reports);
     const caseResult: CaseResult = result ?? {
       caseId: label.case_id,
       label: label.label as Exclude<Label, "unknown">,
@@ -218,7 +235,7 @@ async function main() {
     schemaVersion: "1.0",
     evaluator: "PathGuard benchmark evaluator",
     generatedAt: new Date().toISOString(),
-    input: {report:args.report,labels:args.labels,externalRanking:args.externalRanking ?? null,externalName:externalScores ? externalName : null,scanGeneratedAt:report.generatedAt ?? null,scanTool:report.tool ?? null,k:args.k},
+    input: {report:args.report ?? null,reportsDir:args.reportsDir ?? null,reportCount:reportEntries.length,labels:args.labels,externalRanking:args.externalRanking ?? null,externalName:externalScores ? externalName : null,scanGeneratedAt:reportEntries.map((entry) => entry.report.generatedAt ?? null),scanTool:reportEntries.map((entry) => entry.report.tool ?? null),k:args.k},
     protocol: {
       relevantLabel: "reachable",
       negativeLabel: "not_reachable",
