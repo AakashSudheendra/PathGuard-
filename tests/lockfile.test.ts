@@ -3,10 +3,11 @@ import assert from "node:assert/strict";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { readNpmLockfile } from "../apps/scanner/src/lockfile.js";
 
 test("reads v3 lockfile and skips root package", async () => {
-  const deps = await readNpmLockfile(new URL("./fixtures/vulnerable-package-lock.json", import.meta.url).pathname);
+  const deps = await readNpmLockfile(fileURLToPath(new URL("./fixtures/vulnerable-package-lock.json", import.meta.url)));
   assert.deepEqual(deps, [{ name: "lodash", version: "4.17.20" }]);
 });
 
