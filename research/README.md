@@ -26,7 +26,7 @@ The synthetic fixtures in `research/fixtures` are used only to smoke-test the to
 
 ## Advisory-specific source evidence
 
-The current prototype contains seven provisional mappings: four lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744, plus three @fastify/busboy parser-entry mappings for CVE-2026-19484, CVE-2026-19481, and CVE-2026-74866. Each has an NVD reference and rationale. The Busboy mappings are supported by advisory descriptions and a direct parser invocation in Parse Server's multipart router, but do not prove vulnerable-branch execution or exploit preconditions. Unlisted advisories remain unknown; matching a call reference is not proof of runtime reachability or exploitability. All mappings need independent review before benchmark labels rely on them.
+The current prototype contains eight provisional mappings: four lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744; three @fastify/busboy parser-entry mappings for CVE-2026-19484, CVE-2026-19481, and CVE-2026-74866; and one @graphql-tools/utils mapping for mergeDeep (CVE-2026-104852). Each has an NVD reference and rationale. The Busboy mappings are supported by advisory descriptions and a direct parser invocation in Parse Server's multipart router, but do not prove vulnerable-branch execution or exploit preconditions. Unlisted advisories remain unknown; matching a call reference is not proof of runtime reachability or exploitability. All mappings need independent review before benchmark labels rely on them.
 
 ## Label template and reviewer procedure
 
