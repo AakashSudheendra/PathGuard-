@@ -34,8 +34,12 @@
       "ranking": {
         "cvssBaseScore": 9.8,
         "epssProbability": 0.8,
-        "priorityScore": 85,
-        "formulaVersion": "pathguard-v1"
+        "priorityScore": 62.3,
+        "formulaVersion": "pathguard-v1",
+        "cvssContribution": 34.3,
+        "epssContribution": 28,
+        "sourceContribution": 0,
+        "sourceEvidenceLevel": "none-or-unknown"
       }
     },
     {
@@ -66,8 +70,12 @@
       "ranking": {
         "cvssBaseScore": 5.4,
         "epssProbability": 0.1,
-        "priorityScore": 35,
-        "formulaVersion": "pathguard-v1"
+        "priorityScore": 22.4,
+        "formulaVersion": "pathguard-v1",
+        "cvssContribution": 18.9,
+        "epssContribution": 3.5,
+        "sourceContribution": 0,
+        "sourceEvidenceLevel": "none-or-unknown"
       }
     },
     {
