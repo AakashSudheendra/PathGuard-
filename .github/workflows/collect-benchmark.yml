@@ -157,7 +157,7 @@ jobs:
               "https://github.com/parse-community/parse-server": "304c1a5d4e752958c7c9b41425fe1ee546111fc6"
             },
             "labelStatus": "unreviewed; no ground-truth labels assigned",
-            "mappingInventory": "four lodash and three provisional Busboy mappings",
+            "mappingInventory": "four lodash, three provisional Busboy, and one GraphQL utility mapping",
             "interpretation": "candidate discovery and baseline outputs only; not empirical evaluation results"
           }
           EOF
