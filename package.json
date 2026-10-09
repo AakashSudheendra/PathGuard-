@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "description": "Evidence-guided prioritization of npm dependency vulnerabilities",
-  "workspaces": ["apps/scanner"],
+  "workspaces": [
+    "apps/scanner"
+  ],
   "scripts": {
     "build": "npm --workspace @pathguard/scanner run build",
     "test": "npm --workspace @pathguard/scanner test",
     "scan": "npm --workspace @pathguard/scanner run start --",
     "scan:fixture": "npm --workspace @pathguard/scanner run scan:fixture",
-    "dev:scan": "npm --workspace @pathguard/scanner run dev --"
+    "dev:scan": "npm --workspace @pathguard/scanner run dev --",
+    "evaluate:benchmark": "tsx research/evaluate-benchmark.ts"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
