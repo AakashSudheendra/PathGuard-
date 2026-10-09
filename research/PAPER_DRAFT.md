@@ -55,6 +55,11 @@ This analysis is not a whole-program call graph. It does not comprehensively res
 
 The prototype currently contains eight provisional advisory-to-symbol mappings: four lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744 [5]–[8], three @fastify/busboy mappings for CVE-2026-19484, CVE-2026-19481, and CVE-2026-74866 [9]–[11], and one @graphql-tools/utils mapping for CVE-2026-104852 [13]. Each mapping includes an advisory reference and rationale. The Busboy mappings treat the default-import parser invocation in Parse Server's multipart router at a pinned commit as an entry-point hint [12]; advisory-specific vulnerable branches and downstream conditions are not proven. A match means that a detected call reference matches a provisional symbol hint, not that runtime reachability or exploitability is established. These mappings require independent review before being used as benchmark ground truth.
 
+#### Illustrative code/advisory alignment (not a benchmark label)
+
+At the pinned Parse Server commit, the lockfile resolves `@fastify/busboy` to version 3.2.0. Its `FunctionsRouter.js` multipart middleware checks for `multipart/form-data` and passes `req.headers` to the default-imported `Busboy` parser at line 220 [12]. The CVE-2026-19484 advisory describes an event-loop denial of service caused by a crafted multipart boundary in affected versions before 3.2.1 [9]. This is a concrete reason to map the parser entry point to the advisory, rather than treating package presence alone as usage. It is still not proof that a deployed instance is exposed, that the vulnerable branch executes for a given request, or that every exploit precondition holds. The case remains subject to independent benchmark review.
+
+
 ### 3.4 PathGuard v1 score
 
 The prototype computes a transparent heuristic with a maximum of 100 points:
