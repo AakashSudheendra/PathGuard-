@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { readNpmLockfile, type LockedDependency } from "./lockfile.js";
 import { attachEpssScores, summarizeFindings, type EpssScore, type PackageFinding, type VulnerabilityRecord, type EnrichedVulnerability } from "./report.js";
+import { analyzeSourceUsage, summarizeSourceEvidence, type SourceEvidence } from "./reachability.js";
 
 const OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch";
 const OSV_VULN_URL = "https://api.osv.dev/v1/vulns/";
@@ -16,7 +17,9 @@ interface ScanReport {
   schemaVersion: "1.0";
   tool: { name: "PathGuard"; version: "0.1.0" };
   generatedAt: string;
-  input: { lockfile: string; ecosystem: "npm" };
+  input: { lockfile: string; sourceRoot: string; ecosystem: "npm" };
+  sourceAnalysis: ReturnType<typeof summarizeSourceEvidence>;
+  sourceEvidence: SourceEvidence[];
   sources: { osv: string; epss: string };
   summary: ReturnType<typeof summarizeFindings>;
   dependencies: LockedDependency[];
@@ -26,31 +29,35 @@ interface ScanReport {
     vulnerability: EnrichedVulnerability;
     epss: Array<{ cve: string; score: EpssScore | null }>;
     maxEpssScore: number | null;
+    sourceEvidence: SourceEvidence[];
   }>;
   warnings: string[];
 }
 
-function parseArgs(argv: string[]): { lockfile: string; out: string; limit: number } {
+function parseArgs(argv: string[]): { lockfile: string; out: string; limit: number; sourceRoot: string } {
   let lockfile = "package-lock.json";
   let out = "pathguard-results.json";
+  let sourceRoot: string | undefined;
   let limit = 500;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     const next = argv[i + 1];
     if (arg === "--lockfile" && next) { lockfile = next; i++; }
     else if (arg === "--out" && next) { out = next; i++; }
+    else if (arg === "--source" && next) { sourceRoot = next; i++; }
     else if (arg === "--limit" && next) {
       const parsed = Number(next);
       if (!Number.isInteger(parsed) || parsed < 1 || parsed > 5000) throw new Error("--limit must be an integer from 1 to 5000.");
       limit = parsed; i++;
     } else if (arg === "--help" || arg === "-h") {
-      console.log("PathGuard npm dependency scanner\n\nUsage: npm run scan -- --lockfile <path> [--out <path>] [--limit <count>]\nDefaults: package-lock.json, pathguard-results.json, limit=500");
+      console.log("PathGuard npm dependency scanner\n\nUsage: npm run scan -- --lockfile <path> [--source <project-dir>] [--out <path>] [--limit <count>]\nDefaults: package-lock.json, source directory beside lockfile, pathguard-results.json, limit=500");
       process.exit(0);
     } else {
       throw new Error(`Unknown or incomplete argument: ${arg}. Use --help.`);
     }
   }
-  return { lockfile: resolve(lockfile), out: resolve(out), limit };
+  const resolvedLockfile = resolve(lockfile);
+  return { lockfile: resolvedLockfile, out: resolve(out), limit, sourceRoot: resolve(sourceRoot ?? dirname(resolvedLockfile)) };
 }
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -132,6 +139,13 @@ async function run(): Promise<void> {
   }
   const scanned = dependencies.slice(0, args.limit);
   console.log(`PathGuard: scanning ${scanned.length} of ${dependencies.length} dependencies...`);
+  let sourceEvidence: SourceEvidence[] = [];
+  try {
+    sourceEvidence = await analyzeSourceUsage(args.sourceRoot, new Set(scanned.map((dependency) => dependency.name)));
+    console.log(`Source evidence: ${sourceEvidence.length} import/call references across ${summarizeSourceEvidence(sourceEvidence).packagesWithEvidence} dependencies.`);
+  } catch (error) {
+    warnings.push(`Source analysis failed for ${args.sourceRoot}: ${String(error)}`);
+  }
   const osvByPackage = await queryOsv(scanned, warnings);
 
   const rawFindings: Array<{ name: string; version: string; vulnerability: OsvVulnerability }> = [];
@@ -157,7 +171,8 @@ async function run(): Promise<void> {
       version: finding.version,
       vulnerability: vulnerability!,
       epss,
-      maxEpssScore: presentScores.length ? Math.max(...presentScores) : null
+      maxEpssScore: presentScores.length ? Math.max(...presentScores) : null,
+      sourceEvidence: sourceEvidence.filter((item) => item.packageName === finding.name)
     };
   });
 
@@ -169,7 +184,9 @@ async function run(): Promise<void> {
     schemaVersion: "1.0",
     tool: { name: "PathGuard", version: "0.1.0" },
     generatedAt: new Date().toISOString(),
-    input: { lockfile: args.lockfile, ecosystem: "npm" },
+    input: { lockfile: args.lockfile, sourceRoot: args.sourceRoot, ecosystem: "npm" },
+    sourceAnalysis: summarizeSourceEvidence(sourceEvidence),
+    sourceEvidence,
     sources: { osv: OSV_BATCH_URL, epss: EPSS_URL },
     summary: summarizeFindings(scanned.length, findings),
     dependencies: scanned,
