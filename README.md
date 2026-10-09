@@ -13,7 +13,7 @@ PathGuard analyzes npm lockfiles, enriches findings with OSV advisory data and E
 - [x] OSV advisory queries and CVE alias enrichment
 - [x] FIRST EPSS enrichment with missing-data handling
 - [x] Static TypeScript source evidence for selected imports, CommonJS bindings, and direct call references
-- [x] Advisory-specific vulnerable-symbol evidence with provisional lodash and Busboy mappings
+- [x] Advisory-specific vulnerable-symbol evidence with provisional lodash, Busboy, and GraphQL utility mappings
 - [x] Versioned explainable `pathguard-v1` ranking and CVSS v3.x vector parsing
 - [x] Benchmark evaluator for CVSS-only, EPSS-only, PathGuard, and optional external ranking scores
 - [x] Repository/commit-specific matching, label validation, coverage reporting, and ranking metrics
