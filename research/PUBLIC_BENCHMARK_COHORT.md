@@ -14,15 +14,17 @@ The GitHub Actions workflow `.github/workflows/collect-benchmark.yml` scans the 
 
 ## Reproduce collection
 
-Open the [Collect Public Benchmark Candidates workflow](https://github.com/AakashSudheendra/PathGuard-/actions/workflows/collect-benchmark.yml) and run **Run workflow**, or push a change to that workflow file. The workflow builds PathGuard, checks out each repository at its pinned commit, scans with OSV and EPSS enrichment, generates an unlabeled candidate manifest, and uploads scan reports plus CSV as the `pathguard-public-benchmark-candidates` artifact.
+Open the [Collect Public Benchmark Candidates workflow](https://github.com/AakashSudheendra/PathGuard-/actions/workflows/collect-benchmark.yml) and run **Run workflow**, or push a change to that workflow file. The workflow builds PathGuard, checks out each repository at its pinned commit, runs PathGuard and the pinned OSV-Scanner v2.6.0 against the same lockfiles, merges cases discovered by either tool, and uploads the raw scan reports, an unlabeled union candidate CSV, and an OSV-Scanner CVSS baseline score CSV as the `pathguard-public-benchmark-candidates` artifact. The OSV-Scanner binary is checksum-verified before execution.
+
+The OSV-Scanner score CSV uses the maximum CVSS base score reported by OSV-Scanner for a matched advisory; cases not flagged receive score 0. This is a **detection-plus-severity baseline**, not an intrinsic priority score emitted by OSV-Scanner. Flagged cases without a parseable CVSS score also receive 0 and are identified in the CSV's `score_source` field. Report that limitation in any analysis.
 
 The scan output records API warnings. Do not treat a report with failed advisory queries as a clean result. Artifacts are temporary workflow outputs; archive the exact reports and record the PathGuard commit, Node version, retrieval dates, and tool versions before analysis.
 
 ## Important interpretation limits
 
 - The cohort is a seed set, not a representative sample of npm applications.
-- Candidate rows are generated from scanner findings and are **unreviewed**. They are not ground truth.
+- Candidate rows are generated from the union of scanner findings and are **unreviewed**. They are not ground truth.
 - Labels must be assigned from the pinned source, advisory details, vulnerable function, relevant call paths, and configuration—not from PathGuard scores.
 - Use two independent reviewers where feasible and retain disagreement notes.
-- A comparison against OSV-Scanner should use the same repository commits and package/version/advisory cases. Include cases found by either tool and explicitly account for cases not found by PathGuard to reduce selection bias.
+- Cases discovered by either scanner must remain in the union candidate set, including cases not found by PathGuard. This helps reduce but does not eliminate selection bias; vulnerabilities missed by both tools remain outside this candidate pool.
 - Do not report precision/recall or ranking results as publication findings until the case set, labels, and baseline outputs are complete and independently checked.
