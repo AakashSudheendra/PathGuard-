@@ -64,10 +64,10 @@ Evaluation should compare at least CVSS-only, EPSS-only, existing scanner output
 
 ## Benchmark evaluation
 
-Use the benchmark evaluator with a scan report and independently reviewed labels. To add a third-party baseline, provide a complete `case_id,score` CSV (higher scores rank first), including score `0` for cases it did not flag:
+For multi-repository evaluation, save one JSON report per pinned repository commit in `research/scan-reports`. Scan each repository with `--repo-url` and its full `--commit` SHA so the evaluator can join findings to labels without cross-repository false matches. Then evaluate independently reviewed labels. To add a third-party baseline, provide a complete `case_id,score` CSV (higher scores rank first), including score `0` for cases it did not flag:
 
 ```powershell
-npm run evaluate:benchmark -- --report ".\\pathguard-results.json" --labels ".\\research\\labeled-cases.csv" --external-ranking ".\\research\\external-scores.csv" --external-name "OSV-Scanner" --out ".\\research\\metrics.json" --k 5
+npm run evaluate:benchmark -- --reports-dir ".\\research\\scan-reports" --labels ".\\research\\labeled-cases.csv" --external-ranking ".\\research\\external-scores.csv" --external-name "OSV-Scanner" --out ".\\research\\metrics.json" --k 5
 ```
 
 The template is empty by design, so create a populated copy before evaluation. See [the benchmark protocol](docs/BENCHMARK_PROTOCOL.md). Never present the synthetic CI fixture as empirical evidence.
