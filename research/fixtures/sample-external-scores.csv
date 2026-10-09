@@ -1,0 +1,5 @@
+case_id,score
+sample-reachable,1
+sample-not-reachable,0.5
+sample-unknown,0
+sample-unmatched,0.8
