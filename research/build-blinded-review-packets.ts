@@ -52,7 +52,7 @@ async function main() {
   await writeFile(resolve(outDir, "reviewer-1-blinded.csv"), csv, "utf8");
   await writeFile(resolve(outDir, "reviewer-2-blinded.csv"), csv, "utf8");
   const adjudication = [["case_id", "label", "disagreement_notes"], ...input.map((row) => [String(row.case_id ?? ""), "", ""])];
-  await writeFile(resolve(outDir, "adjudication-template.csv"), adjudication.map((row) => row.map(csvCell).join(",")).join("\\r\\n") + "\\r\\n", "utf8");
+  await writeFile(resolve(outDir, "adjudication-template.csv"), adjudication.map((row) => row.map(csvCell).join(",")).join("\r\n") + "\r\n", "utf8");
   const guide = `# Independent benchmark review instructions
 
 These two CSV files are identical blank copies for independent reviewers. Give one file to each reviewer. Do not share either reviewer's decisions until both copies are complete.
