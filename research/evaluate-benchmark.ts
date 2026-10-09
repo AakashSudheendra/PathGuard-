@@ -157,8 +157,15 @@ async function main() {
   const labels = parseLabels(await readFile(args.labels,"utf8"));
   const results = labels.map((label) => ({label, result:scoreFor(label, report.findings ?? [])}));
   const matched = results.filter((x) => x.result !== null);
-  const evaluable = matched.filter((x) => x.label.label !== "unknown" && x.result !== null)
-    .map((x) => x.result!) as CaseResult[];
+  // Evaluate all labeled reachable/not_reachable cases. If a scan has no matching finding,
+  // score it as zero for every method: retrieval failure is part of end-to-end performance.
+  const evaluable = results.filter((x) => x.label.label !== "unknown").map((x) =>
+    x.result ?? {
+      caseId: x.label.case_id,
+      label: x.label.label as Exclude<Label, "unknown">,
+      scores: {"cvss-only": 0, "epss-only": 0, "pathguard-v1": 0}
+    }
+  ) as CaseResult[];
   const methods: Array<keyof CaseResult["scores"]> = ["cvss-only","epss-only","pathguard-v1"];
   const output = {
     schemaVersion: "1.0",
@@ -169,7 +176,8 @@ async function main() {
       relevantLabel: "reachable",
       negativeLabel: "not_reachable",
       unknownLabel: "unknown (excluded from ranking metrics)",
-      unmatchedCasesExcludedFromRankingMetrics: true,
+      unmatchedCasesExcludedFromRankingMetrics: false,
+      unmatchedCasePolicy: "unmatched labeled cases receive score zero for all methods and remain in the ranking denominator",
       missingCvssOrEpssScore: "0 for baseline ordering only; the report keeps the original value null",
       tieBreak: "case_id ascending",
       bootstrap: "1000 deterministic case-level resamples; percentile 95% interval for nDCG@k"
@@ -180,7 +188,7 @@ async function main() {
       unmatchedRows: labels.length - matched.length,
       matchedCoverage: labels.length ? matched.length / labels.length : 0,
       unknownMatchedRows: matched.filter((x) => x.label.label === "unknown").length,
-      evaluableMatchedRows: evaluable.length
+      evaluableLabeledRows: evaluable.length
     },
     metrics: methods.map((method) => metrics(evaluable,method,args.k)),
     unmatchedCaseIds: results.filter((x) => x.result === null).map((x) => x.label.case_id)
