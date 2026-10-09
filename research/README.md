@@ -14,7 +14,7 @@ This folder contains the benchmark evaluator, candidate generator, label templat
 
 ## Initial public cohort
 
-[PUBLIC_BENCHMARK_COHORT.md](PUBLIC_BENCHMARK_COHORT.md) documents the initial five-repository seed cohort and the workflow that scans each repository at a pinned commit. This is a convenience sample, not a representative benchmark. The workflow uploads scan reports and an unlabeled candidate CSV as an artifact; candidates require independent review and are not ground truth.
+[PUBLIC_BENCHMARK_COHORT.md](PUBLIC_BENCHMARK_COHORT.md) documents the initial five-repository seed cohort and the workflow that scans each repository at a pinned commit. This is a convenience sample, not a representative benchmark. The workflow uploads scan reports, a union candidate CSV, baseline scores, a reproducibility manifest, and two blinded reviewer packets. The packets omit PathGuard scores, CVSS/EPSS scores, discovery-source flags, and source-analysis output so the two reviewers can label independently. Candidates require independent review and are not ground truth.
 
 ## Evaluator
 
@@ -30,7 +30,7 @@ The current prototype contains seven provisional mappings: four lodash mappings 
 
 ## Label template and reviewer procedure
 
-`benchmark-label-template.csv` includes repository URL and commit SHA, package/version, advisory identifiers, reviewer 1 and reviewer 2 labels, final adjudicated label, and disagreement notes. Keep the raw reviewer labels rather than overwriting them with the final adjudication. Any disagreement should have a documented rationale.
+`benchmark-label-template.csv` includes repository URL and commit SHA, package/version, advisory identifiers, advisory summaries and references, evidence fields for analysis after unblinding, reviewer labels, final adjudicated label, and disagreement notes. The workflow also creates blinded reviewer packets without ranking or source-analysis fields. Keep both original reviewer CSVs unchanged, adjudicate disagreements separately, and use `npm run merge:review-labels` to validate and combine the two reviewer files with a complete adjudication CSV. The merge tool requires distinct, consistent reviewer identities and disagreement notes whenever the labels differ.
 
 ## Publication status
 
