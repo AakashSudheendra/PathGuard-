@@ -1,6 +1,6 @@
 # Research workspace
 
-This folder contains the benchmark evaluator, label template, experimental protocol, and manuscript artifacts.
+This folder contains the benchmark evaluator, candidate generator, label template, experimental protocol, and manuscript artifacts.
 
 ## Required evaluation before research claims
 
@@ -12,11 +12,17 @@ This folder contains the benchmark evaluator, label template, experimental proto
 6. Report precision@k, recall@k, nDCG@k, coverage, runtime, failed queries, and uncertainty estimates where the sample size supports them.
 7. Keep raw third-party datasets out of Git where licensing or size makes that inappropriate; document download and version steps.
 
+## Initial public cohort
+
+[PUBLIC_BENCHMARK_COHORT.md](PUBLIC_BENCHMARK_COHORT.md) documents the initial five-repository seed cohort and the workflow that scans each repository at a pinned commit. This is a convenience sample, not a representative benchmark. The workflow uploads scan reports and an unlabeled candidate CSV as an artifact; candidates require independent review and are not ground truth.
+
 ## Evaluator
 
 `evaluate-benchmark.ts` accepts one report or a directory of reports and joins cases by repository URL, immutable commit SHA, package/version, and vulnerability identifiers. It reports label coverage, precision@k, recall@k, nDCG@k, and a deterministic bootstrap percentile interval for nDCG@k. It supports CVSS-only, EPSS-only, PathGuard v1, and an optional external ranking CSV. The external CSV must include every label case, including explicit score-zero rows for cases not flagged by the external tool.
 
-The synthetic fixtures in `research/fixtures` are used only to smoke-test the evaluator in CI. They are not empirical data and must never be cited as a result.
+`build-candidate-manifest.ts` creates stable case IDs from real schema 1.1 scan reports, deduplicates findings, and leaves all labels blank. It refuses reports without repository URL and a full immutable commit SHA.
+
+The synthetic fixtures in `research/fixtures` are used only to smoke-test the tooling in CI. They are not empirical data and must never be cited as a result.
 
 ## Advisory-specific source evidence
 
