@@ -19,7 +19,7 @@ interface ScanReport {
   schemaVersion: "1.0";
   tool: { name: "PathGuard"; version: "0.1.0" };
   generatedAt: string;
-  input: { lockfile: string; sourceRoot: string; ecosystem: "npm" };
+  input: { lockfile: string; sourceRoot: string; ecosystem: "npm"; repositoryUrl?: string; repositoryCommit?: string };
   sourceAnalysis: ReturnType<typeof summarizeSourceEvidence>;
   sourceEvidence: SourceEvidence[];
   sources: { osv: string; epss: string };
@@ -38,10 +38,12 @@ interface ScanReport {
   warnings: string[];
 }
 
-function parseArgs(argv: string[]): { lockfile: string; out: string; limit: number; sourceRoot: string } {
+function parseArgs(argv: string[]): { lockfile: string; out: string; limit: number; sourceRoot: string; repositoryUrl?: string; repositoryCommit?: string } {
   let lockfile = "package-lock.json";
   let out = "pathguard-results.json";
   let sourceRoot: string | undefined;
+  let repositoryUrl: string | undefined;
+  let repositoryCommit: string | undefined;
   let limit = 500;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -49,12 +51,14 @@ function parseArgs(argv: string[]): { lockfile: string; out: string; limit: numb
     if (arg === "--lockfile" && next) { lockfile = next; i++; }
     else if (arg === "--out" && next) { out = next; i++; }
     else if (arg === "--source" && next) { sourceRoot = next; i++; }
+    else if (arg === "--repo-url" && next) { repositoryUrl = next; i++; }
+    else if (arg === "--commit" && next) { repositoryCommit = next; i++; }
     else if (arg === "--limit" && next) {
       const parsed = Number(next);
       if (!Number.isInteger(parsed) || parsed < 1 || parsed > 5000) throw new Error("--limit must be an integer from 1 to 5000.");
       limit = parsed; i++;
     } else if (arg === "--help" || arg === "-h") {
-      console.log("PathGuard npm dependency scanner\n\nUsage: npm run scan -- --lockfile <path> [--source <project-dir>] [--out <path>] [--limit <count>]\nDefaults: package-lock.json, source directory beside lockfile, pathguard-results.json, limit=500");
+      console.log("PathGuard npm dependency scanner\n\nUsage: npm run scan -- --lockfile <path> [--source <project-dir>] [--repo-url <url> --commit <sha>] [--out <path>] [--limit <count>]\nDefaults: package-lock.json, source directory beside lockfile, pathguard-results.json, limit=500");
       process.exit(0);
     } else {
       throw new Error(`Unknown or incomplete argument: ${arg}. Use --help.`);
@@ -67,7 +71,9 @@ function parseArgs(argv: string[]): { lockfile: string; out: string; limit: numb
     lockfile: resolvedLockfile,
     out: resolve(invocationRoot, out),
     limit,
-    sourceRoot: resolve(invocationRoot, sourceRoot ?? dirname(resolvedLockfile))
+    sourceRoot: resolve(invocationRoot, sourceRoot ?? dirname(resolvedLockfile)),
+    ...(repositoryUrl && { repositoryUrl }),
+    ...(repositoryCommit && { repositoryCommit })
   };
 }
 
@@ -204,7 +210,7 @@ async function run(): Promise<void> {
     schemaVersion: "1.0",
     tool: { name: "PathGuard", version: "0.1.0" },
     generatedAt: new Date().toISOString(),
-    input: { lockfile: args.lockfile, sourceRoot: args.sourceRoot, ecosystem: "npm" },
+    input: { lockfile: args.lockfile, sourceRoot: args.sourceRoot, ecosystem: "npm", ...(args.repositoryUrl && { repositoryUrl: args.repositoryUrl }), ...(args.repositoryCommit && { repositoryCommit: args.repositoryCommit }) },
     sourceAnalysis: summarizeSourceEvidence(sourceEvidence),
     sourceEvidence,
     sources: { osv: OSV_BATCH_URL, epss: EPSS_URL },
