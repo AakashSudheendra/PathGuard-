@@ -52,11 +52,27 @@ function parseLabels(text: string): LabelRow[] {
   const headers = rows.shift()?.map((x) => x.trim()) ?? [];
   const required = ["case_id", "package_name", "installed_version", "osv_ids", "cve_ids", "label"];
   for (const name of required) if (!headers.includes(name)) throw new Error(`Labels CSV missing required column: ${name}`);
+  const seenCaseIds = new Set<string>();
   return rows.map((values, index) => {
     const record = Object.fromEntries(headers.map((header, i) => [header, values[i] ?? ""])) as LabelRow;
     record.label = record.label.trim().toLowerCase() as Label;
     if (!record.case_id || !record.package_name || !record.installed_version) throw new Error(`Labels CSV row ${index + 2} is missing case_id, package_name, or installed_version.`);
+    if (seenCaseIds.has(record.case_id)) throw new Error(`Duplicate case_id on CSV row ${index + 2}: ${record.case_id}`);
+    seenCaseIds.add(record.case_id);
     if (!["reachable", "not_reachable", "unknown"].includes(record.label)) throw new Error(`Invalid label on CSV row ${index + 2}: ${record.label}`);
+    if (!record.osv_ids.trim() && !record.cve_ids.trim()) throw new Error(`Labels CSV row ${index + 2} must include at least one OSV or CVE identifier.`);
+    const reviewer1 = (record.reviewer_1_label ?? "").trim().toLowerCase();
+    const reviewer2 = (record.reviewer_2_label ?? "").trim().toLowerCase();
+    for (const reviewerLabel of [reviewer1, reviewer2]) {
+      if (reviewerLabel && !["reachable", "not_reachable", "unknown"].includes(reviewerLabel)) {
+        throw new Error(`Invalid independent reviewer label on CSV row ${index + 2}: ${reviewerLabel}`);
+      }
+    }
+    const disagreement = reviewer1 && reviewer2 && reviewer1 !== reviewer2;
+    const finalDisagrees = (reviewer1 && reviewer1 !== record.label) || (reviewer2 && reviewer2 !== record.label);
+    if ((disagreement || finalDisagrees) && !(record.disagreement_notes ?? "").trim()) {
+      throw new Error(`Labels CSV row ${index + 2} has reviewer/adjudicated disagreement but no disagreement_notes.`);
+    }
     return record;
   });
 }
