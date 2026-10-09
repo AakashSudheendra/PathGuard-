@@ -15,7 +15,8 @@
     "evaluate:benchmark": "tsx research/evaluate-benchmark.ts",
     "build:candidates": "tsx research/build-candidate-manifest.ts",
     "build:osv-scores": "tsx research/build-osv-scores.ts",
-    "build:review-packets": "tsx research/build-blinded-review-packets.ts"
+    "build:review-packets": "tsx research/build-blinded-review-packets.ts",
+    "merge:review-labels": "tsx research/merge-review-labels.ts"
   },
   "engines": {
     "node": ">=20"
