@@ -14,7 +14,7 @@ This folder contains the benchmark evaluator, candidate generator, label templat
 
 ## Initial public cohort
 
-[PUBLIC_BENCHMARK_COHORT.md](PUBLIC_BENCHMARK_COHORT.md) documents the initial five-repository seed cohort and the workflow that scans each repository at a pinned commit. This is a convenience sample, not a representative benchmark. The workflow uploads scan reports, a union candidate CSV, baseline scores, a reproducibility manifest, and two blinded reviewer packets. The packets omit PathGuard scores, CVSS/EPSS scores, discovery-source flags, and source-analysis output so the two reviewers can label independently. Candidates require independent review and are not ground truth.
+[PUBLIC_BENCHMARK_COHORT.md](PUBLIC_BENCHMARK_COHORT.md) documents the original seed cohort and the expanded nine-repository workflow that scans each repository at a pinned commit. This is a convenience sample, not a representative benchmark. The workflow uploads scan reports, a union candidate CSV, baseline scores, a reproducibility manifest, and two blinded reviewer packets. The packets omit PathGuard scores, CVSS/EPSS scores, discovery-source flags, and source-analysis output so the two reviewers can label independently. Candidates require independent review and are not ground truth.
 
 ## Evaluator
 
@@ -34,4 +34,4 @@ The current prototype contains eight provisional mappings: four lodash mappings 
 
 ## Publication status
 
-The software pipeline, original seven-repository seed scan, OSV-Scanner v2.6.0 baseline outputs, and synthetic CI smoke tests are implemented. The collection workflow has been expanded to include Socket.IO and NestJS, with immutable commit checks. The empirical work is not complete: the expanded outputs must be checked, the cohort remains a convenience sample, reviewer labels and adjudication are not filled, and comparative metrics and error analysis have not been produced. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [PAPER_DRAFT.md](PAPER_DRAFT.md).
+The software pipeline, original seven-repository seed scan, and expanded nine-repository collection have completed successfully. The expanded run checked 8,659 dependency entries, recorded 430 raw PathGuard findings, and produced 427 unique candidate cases; all 427 were found by both scanners. The cohort remains a convenience sample, all reviewer labels are blank, and comparative ranking metrics and error analysis have not been produced. See [EXPANDED_COHORT_COLLECTION.md](EXPANDED_COHORT_COLLECTION.md), [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md), and [PAPER_DRAFT.md](PAPER_DRAFT.md).
