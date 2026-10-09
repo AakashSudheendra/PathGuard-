@@ -10,3 +10,7 @@ Do not claim:
 - that a benchmark is independent if labels were assigned using PathGuard's own score.
 
 Any published evaluation should specify inclusion criteria, ground-truth procedure, API snapshots or retrieval dates, comparison methods, repeated runs where appropriate, limitations, and error analysis.
+
+## Advisory-to-symbol matching
+
+PathGuard now has a small manually curated advisory-to-symbol mapping and reports whether source-level call evidence matches it. This is a triage hint, not a general vulnerability-function database. The mapping must include a reference and rationale, and should be reviewed before use in research. `vulnerable-symbol-observed` means a syntax-tree call reference matches the curated symbol; it does not prove runtime reachability, attacker-controlled input, or exploitability. `no-matching-symbol-evidence` is not proof of non-reachability. `no-curated-symbol-mapping` must be treated as unknown.
