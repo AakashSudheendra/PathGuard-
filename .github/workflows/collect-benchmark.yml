@@ -1,0 +1,80 @@
+name: Collect Public Benchmark Candidates
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/collect-benchmark.yml"
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PathGuard
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install and build PathGuard
+        run: |
+          npm ci
+          npm run build
+      - name: Checkout pinned Axios repository
+        uses: actions/checkout@v4
+        with:
+          repository: axios/axios
+          ref: 1a94bdbdf0518f3adbeada510b747aff80847ed
+          path: targets/axios
+          persist-credentials: false
+      - name: Checkout pinned Undici repository
+        uses: actions/checkout@v4
+        with:
+          repository: nodejs/undici
+          ref: e960331c83346ce770a7a58d7cfb6afb4aec0ccf
+          path: targets/undici
+          persist-credentials: false
+      - name: Checkout pinned npm CLI repository
+        uses: actions/checkout@v4
+        with:
+          repository: npm/cli
+          ref: b317f16c80df02ea3628cfa77170d5ae9b59720c
+          path: targets/npm-cli
+          persist-credentials: false
+      - name: Checkout pinned Marked repository
+        uses: actions/checkout@v4
+        with:
+          repository: markedjs/marked
+          ref: eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c
+          path: targets/marked
+          persist-credentials: false
+      - name: Checkout pinned Yargs repository
+        uses: actions/checkout@v4
+        with:
+          repository: yargs/yargs
+          ref: b2dbcc538062829bd720f8cbfb6b4765bae6b4b8
+          path: targets/yargs
+          persist-credentials: false
+      - name: Scan Axios
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/axios/package-lock.json" --source "$GITHUB_WORKSPACE/targets/axios/lib" --repo-url "https://github.com/axios/axios" --commit "1a94bdbdf0518f3adbeada510b747aff80847ed" --out "$GITHUB_WORKSPACE/research/scan-reports/axios.json" --limit 2000
+      - name: Scan Undici
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/undici/package-lock.json" --source "$GITHUB_WORKSPACE/targets/undici/lib" --repo-url "https://github.com/nodejs/undici" --commit "e960331c83346ce770a7a58d7cfb6afb4aec0ccf" --out "$GITHUB_WORKSPACE/research/scan-reports/undici.json" --limit 2000
+      - name: Scan npm CLI
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/npm-cli/package-lock.json" --source "$GITHUB_WORKSPACE/targets/npm-cli/lib" --repo-url "https://github.com/npm/cli" --commit "b317f16c80df02ea3628cfa77170d5ae9b59720c" --out "$GITHUB_WORKSPACE/research/scan-reports/npm-cli.json" --limit 2000
+      - name: Scan Marked
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/marked/package-lock.json" --source "$GITHUB_WORKSPACE/targets/marked/src" --repo-url "https://github.com/markedjs/marked" --commit "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c" --out "$GITHUB_WORKSPACE/research/scan-reports/marked.json" --limit 2000
+      - name: Scan Yargs
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/yargs/package-lock.json" --source "$GITHUB_WORKSPACE/targets/yargs/lib" --repo-url "https://github.com/yargs/yargs" --commit "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8" --out "$GITHUB_WORKSPACE/research/scan-reports/yargs.json" --limit 2000
+      - name: Generate unlabeled candidate manifest
+        run: npm run build:candidates -- --reports-dir "$GITHUB_WORKSPACE/research/scan-reports" --out "$GITHUB_WORKSPACE/research/benchmark-candidates.csv"
+      - name: Upload scan reports and unlabeled candidates
+        uses: actions/upload-artifact@v4
+        with:
+          name: pathguard-public-benchmark-candidates
+          path: |
+            research/scan-reports/*.json
+            research/benchmark-candidates.csv
+          if-no-files-found: error
+          retention-days: 30
