@@ -91,7 +91,7 @@ Compare CVSS-only, EPSS-only, and PathGuard v1 on the same case set. Add OSV-Sca
 
 ### 4.4 Metrics and statistical reporting
 
-Report coverage, precision@k, recall@k, nDCG@k, runtime, API failures, and unmatched cases. Report deterministic bootstrap percentile intervals for nDCG@k where sample size permits. The evaluator excludes `unknown` from primary ranking metrics and reports unknown and unmatched cases separately. Report the value of k and the exact evaluable denominator. If the sample is too small to support stable inference, describe the results as exploratory.
+Report coverage, precision@k, recall@k, nDCG@k, runtime, API failures, and unmatched cases. Report deterministic bootstrap percentile intervals for nDCG@k where sample size permits. The evaluator excludes `unknown` from primary ranking metrics and reports unknown cases separately. A labeled reachable/not-reachable case missing from the scan output receives score zero for all ranking methods and remains in the denominator, so metrics include retrieval misses as well as ordering quality. Report matched coverage, unmatched case IDs, the value of k, and the exact evaluable denominator. If the sample is too small to support stable inference, describe the results as exploratory.
 
 ### 4.5 Results
 
