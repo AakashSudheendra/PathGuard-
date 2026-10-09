@@ -34,4 +34,4 @@ The current prototype contains eight provisional mappings: four lodash mappings 
 
 ## Publication status
 
-The software pipeline, pinned seven-repository seed scan, OSV-Scanner v2.6.0 baseline outputs, and synthetic CI smoke tests are implemented. The empirical work is not complete: the seed is a convenience sample, reviewer labels and adjudication are not filled, the final expanded cohort has not been frozen, and comparative metrics and error analysis have not been produced. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [PAPER_DRAFT.md](PAPER_DRAFT.md).
+The software pipeline, original seven-repository seed scan, OSV-Scanner v2.6.0 baseline outputs, and synthetic CI smoke tests are implemented. The collection workflow has been expanded to include Socket.IO and NestJS, with immutable commit checks. The empirical work is not complete: the expanded outputs must be checked, the cohort remains a convenience sample, reviewer labels and adjudication are not filled, and comparative metrics and error analysis have not been produced. See [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md) and [PAPER_DRAFT.md](PAPER_DRAFT.md).
