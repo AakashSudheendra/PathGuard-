@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { readNpmLockfile, type LockedDependency } from "./lockfile.js";
-import { attachEpssScores, summarizeFindings, type EpssScore, type PackageFinding, type VulnerabilityRecord } from "./report.js";
+import { attachEpssScores, summarizeFindings, type EpssScore, type PackageFinding, type VulnerabilityRecord, type EnrichedVulnerability } from "./report.js";
 
 const OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch";
 const OSV_VULN_URL = "https://api.osv.dev/v1/vulns/";
@@ -23,7 +23,7 @@ interface ScanReport {
   findings: Array<{
     name: string;
     version: string;
-    vulnerability: ReturnType<typeof attachEpssScores>[number];
+    vulnerability: EnrichedVulnerability;
     epss: Array<{ cve: string; score: EpssScore | null }>;
     maxEpssScore: number | null;
   }>;
@@ -134,7 +134,7 @@ async function run(): Promise<void> {
   console.log(`PathGuard: scanning ${scanned.length} of ${dependencies.length} dependencies...`);
   const osvByPackage = await queryOsv(scanned, warnings);
 
-  const rawFindings: PackageFinding[] = [];
+  const rawFindings: Array<{ name: string; version: string; vulnerability: OsvVulnerability }> = [];
   for (const dependency of scanned) {
     for (const vulnerability of osvByPackage.get(`${dependency.name}@${dependency.version}`) ?? []) {
       rawFindings.push({ ...dependency, vulnerability });
