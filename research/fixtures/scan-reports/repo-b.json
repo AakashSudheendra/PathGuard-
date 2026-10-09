@@ -38,8 +38,12 @@
       "ranking": {
         "cvssBaseScore": 9.8,
         "epssProbability": 0.65,
-        "priorityScore": 80.75,
-        "formulaVersion": "pathguard-v1"
+        "priorityScore": 57.05,
+        "formulaVersion": "pathguard-v1",
+        "cvssContribution": 34.3,
+        "epssContribution": 22.75,
+        "sourceContribution": 0,
+        "sourceEvidenceLevel": "none-or-unknown"
       }
     }
   ]
