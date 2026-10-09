@@ -68,6 +68,7 @@ The output path is relative to the current directory unless you provide an absol
 - [Publication checklist](research/PUBLICATION_CHECKLIST.md): separates completed engineering from required empirical work.
 - [Benchmark protocol](docs/BENCHMARK_PROTOCOL.md): case selection, independent labels, baselines, metrics, and reproducibility.
 - [Research workspace](research/README.md): dataset and evaluation guidance.
+- [Initial seed-cohort report](research/SEED_COHORT_COLLECTION.md): collected scan counts, baseline coverage, mapping coverage, and limitations.
 - [Research limitations](docs/RESEARCH_LIMITATIONS.md): scope and claims the current implementation cannot support.
 
 ## Collect and prepare benchmark candidates
