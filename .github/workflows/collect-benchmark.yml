@@ -7,7 +7,7 @@ on:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     permissions:
       contents: read
     steps:
@@ -57,6 +57,20 @@ jobs:
           ref: main
           path: targets/yargs
           persist-credentials: false
+      - name: Checkout pinned Node-RED repository
+        uses: actions/checkout@v4
+        with:
+          repository: node-red/node-red
+          ref: main
+          path: targets/node-red
+          persist-credentials: false
+      - name: Checkout pinned Parse Server repository
+        uses: actions/checkout@v4
+        with:
+          repository: parse-community/parse-server
+          ref: alpha
+          path: targets/parse-server
+          persist-credentials: false
       - name: Verify immutable source commits
         shell: bash
         run: |
@@ -65,6 +79,8 @@ jobs:
           test "$(git -C targets/npm-cli rev-parse HEAD)" = "b317f16c80df02ea3628cfa77170d5ae9b59720c"
           test "$(git -C targets/marked rev-parse HEAD)" = "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c"
           test "$(git -C targets/yargs rev-parse HEAD)" = "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8"
+          test "$(git -C targets/node-red rev-parse HEAD)" = "935b8d3e12ec8be064f3a72ac6547131f778a7b1"
+          test "$(git -C targets/parse-server rev-parse HEAD)" = "304c1a5d4e752958c7c9b41425fe1ee546111fc6"
       - name: Install pinned OSV-Scanner
         shell: bash
         run: |
@@ -84,6 +100,10 @@ jobs:
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/marked/package-lock.json" --source "$GITHUB_WORKSPACE/targets/marked/src" --repo-url "https://github.com/markedjs/marked" --commit "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c" --out "$GITHUB_WORKSPACE/research/scan-reports/marked.json" --limit 2000
       - name: Scan Yargs with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/yargs/package-lock.json" --source "$GITHUB_WORKSPACE/targets/yargs/lib" --repo-url "https://github.com/yargs/yargs" --commit "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8" --out "$GITHUB_WORKSPACE/research/scan-reports/yargs.json" --limit 2000
+      - name: Scan Node-RED with PathGuard
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/node-red/package-lock.json" --source "$GITHUB_WORKSPACE/targets/node-red/packages" --repo-url "https://github.com/node-red/node-red" --commit "935b8d3e12ec8be064f3a72ac6547131f778a7b1" --out "$GITHUB_WORKSPACE/research/scan-reports/node-red.json" --limit 3000
+      - name: Scan Parse Server with PathGuard
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/parse-server/package-lock.json" --source "$GITHUB_WORKSPACE/targets/parse-server/src" --repo-url "https://github.com/parse-community/parse-server" --commit "304c1a5d4e752958c7c9b41425fe1ee546111fc6" --out "$GITHUB_WORKSPACE/research/scan-reports/parse-server.json" --limit 3000
       - name: Run OSV-Scanner baseline on pinned lockfiles
         shell: bash
         run: |
@@ -109,10 +129,35 @@ jobs:
           scan_osv npm-cli https://github.com/npm/cli b317f16c80df02ea3628cfa77170d5ae9b59720c "$GITHUB_WORKSPACE/targets/npm-cli/package-lock.json"
           scan_osv marked https://github.com/markedjs/marked eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c "$GITHUB_WORKSPACE/targets/marked/package-lock.json"
           scan_osv yargs https://github.com/yargs/yargs b2dbcc538062829bd720f8cbfb6b4765bae6b4b8 "$GITHUB_WORKSPACE/targets/yargs/package-lock.json"
+          scan_osv node-red https://github.com/node-red/node-red 935b8d3e12ec8be064f3a72ac6547131f778a7b1 "$GITHUB_WORKSPACE/targets/node-red/package-lock.json"
+          scan_osv parse-server https://github.com/parse-community/parse-server 304c1a5d4e752958c7c9b41425fe1ee546111fc6 "$GITHUB_WORKSPACE/targets/parse-server/package-lock.json"
       - name: Generate union candidate manifest
         run: npm run build:candidates -- --reports-dir "$GITHUB_WORKSPACE/research/scan-reports" --external-reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/benchmark-candidates.csv"
       - name: Generate OSV-Scanner CVSS baseline scores
         run: npm run build:osv-scores -- --candidates "$GITHUB_WORKSPACE/research/benchmark-candidates.csv" --reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/osv-scanner-scores.csv"
+      - name: Write reproducibility manifest
+        shell: bash
+        run: |
+          cat > "$GITHUB_WORKSPACE/research/experiment-manifest.json" <<EOF
+          {
+            "collectedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "pathguardCommit": "$GITHUB_SHA",
+            "nodeVersion": "$(node --version)",
+            "npmVersion": "$(npm --version)",
+            "osvScannerVersion": "v2.6.0",
+            "repositoryCommits": {
+              "https://github.com/axios/axios": "1a94bdbdf0518f3adbeada510b747aff80847ed7",
+              "https://github.com/nodejs/undici": "e960331c83346ce770a7a58d7cfb6afb4aec0ccf",
+              "https://github.com/npm/cli": "b317f16c80df02ea3628cfa77170d5ae9b59720c",
+              "https://github.com/markedjs/marked": "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c",
+              "https://github.com/yargs/yargs": "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8",
+              "https://github.com/node-red/node-red": "935b8d3e12ec8be064f3a72ac6547131f778a7b1",
+              "https://github.com/parse-community/parse-server": "304c1a5d4e752958c7c9b41425fe1ee546111fc6"
+            },
+            "labelStatus": "unreviewed; no ground-truth labels assigned",
+            "interpretation": "candidate discovery and baseline outputs only; not empirical evaluation results"
+          }
+          EOF
       - name: Upload scan reports, baseline scores, and unlabeled candidates
         uses: actions/upload-artifact@v4
         with:
@@ -122,5 +167,6 @@ jobs:
             research/osv-scanner-reports/*
             research/benchmark-candidates.csv
             research/osv-scanner-scores.csv
+            research/experiment-manifest.json
           if-no-files-found: error
           retention-days: 30
