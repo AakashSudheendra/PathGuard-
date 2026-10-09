@@ -104,6 +104,11 @@ function parseExternalScores(text: string, labels: LabelRow[]): Map<string, numb
 function scoreFor(label: LabelRow, reports: ScanReport[]): CaseResult | null {
   const wanted = new Set([...ids(label.osv_ids), ...ids(label.cve_ids)]);
   if (!wanted.size) return null;
+  const relevantReports = reports.filter((report) =>
+    report.input?.repositoryUrl === label.repository_url &&
+    report.input?.repositoryCommit === label.commit_sha
+  );
+  const findings = relevantReports.flatMap((report) => report.findings);
   const matches = findings.filter((finding) =>
     finding.name === label.package_name &&
     finding.version === label.installed_version &&
@@ -170,7 +175,7 @@ function parseArgs(argv: string[]) {
     if (!key.startsWith("--") || !argv[i+1] || argv[i+1]!.startsWith("--")) throw new Error(`Expected --option value, got ${key}`);
     args[key.slice(2)] = argv[++i]!;
   }
-  if (!args.report || !args.labels) throw new Error("Usage: npm run evaluate:benchmark -- --report <scan-report.json> --labels <labels.csv> [--out <metrics.json>] [--k 5] [--external-ranking <case_id,score.csv> --external-name <name>]");
+  if ((!args.report && !args["reports-dir"]) || (args.report && args["reports-dir"]) || !args.labels) throw new Error("Usage: npm run evaluate:benchmark -- (--report <scan-report.json> | --reports-dir <reports-directory>) --labels <labels.csv> [--out <metrics.json>] [--k 5] [--external-ranking <case_id,score.csv> --external-name <name>]");
   if (args["external-name"] && !args["external-ranking"]) throw new Error("--external-name requires --external-ranking.");
   const k = args.k === undefined ? 5 : Number(args.k);
   if (!Number.isInteger(k) || k < 1) throw new Error("--k must be a positive integer.");
