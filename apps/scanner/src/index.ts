@@ -4,6 +4,7 @@ import { readNpmLockfile, type LockedDependency } from "./lockfile.js";
 import { attachEpssScores, summarizeFindings, type EpssScore, type PackageFinding, type VulnerabilityRecord, type EnrichedVulnerability } from "./report.js";
 import { analyzeSourceUsage, summarizeSourceEvidence, type SourceEvidence } from "./reachability.js";
 import { assessVulnerableSymbolUsage, type SourceEvidenceAssessment } from "./vulnerability-evidence.js";
+import { rankFinding, type RankingFactors } from "./ranking.js";
 
 const OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch";
 const OSV_VULN_URL = "https://api.osv.dev/v1/vulns/";
@@ -32,6 +33,7 @@ interface ScanReport {
     maxEpssScore: number | null;
     sourceEvidence: SourceEvidence[];
     sourceEvidenceAssessment: SourceEvidenceAssessment;
+    ranking: RankingFactors;
   }>;
   warnings: string[];
 }
@@ -175,23 +177,27 @@ async function run(): Promise<void> {
     const [vulnerability] = attachEpssScores([finding.vulnerability], epssByCve);
     const epss = vulnerability!.epssByCve;
     const presentScores = epss.flatMap((entry) => entry.score ? [entry.score.score] : []);
+    const packageEvidence = sourceEvidence.filter((item) => item.packageName === finding.name);
+    const sourceEvidenceAssessment = assessVulnerableSymbolUsage(
+      finding.vulnerability,
+      finding.name,
+      sourceEvidence
+    );
+    const ranking = rankFinding(vulnerability!, packageEvidence, sourceEvidenceAssessment);
     return {
       name: finding.name,
       version: finding.version,
       vulnerability: vulnerability!,
       epss,
       maxEpssScore: presentScores.length ? Math.max(...presentScores) : null,
-      sourceEvidence: sourceEvidence.filter((item) => item.packageName === finding.name),
-      sourceEvidenceAssessment: assessVulnerableSymbolUsage(
-        finding.vulnerability,
-        finding.name,
-        sourceEvidence
-      )
+      sourceEvidence: packageEvidence,
+      sourceEvidenceAssessment,
+      ranking
     };
   });
 
-  // High EPSS is an evidence dimension, not proof of application reachability.
-  findings.sort((a, b) => (b.maxEpssScore ?? -1) - (a.maxEpssScore ?? -1) ||
+  // Findings are ordered by the versioned PathGuard heuristic; baseline factors remain in each record.
+  findings.sort((a, b) => b.ranking.priorityScore - a.ranking.priorityScore ||
     a.name.localeCompare(b.name) || a.version.localeCompare(b.version));
 
   const report: ScanReport = {
