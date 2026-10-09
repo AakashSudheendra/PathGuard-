@@ -21,3 +21,13 @@ The TypeScript syntax-tree analyzer currently recognizes static ECMAScript impor
 The current priority score is a fixed heuristic: CVSS contributes up to 35 points, EPSS probability contributes up to 35 points, and source evidence contributes up to 30 points for a curated vulnerable-symbol match (18 for a general call reference, 8 for import-only evidence). Missing CVSS/EPSS values remain null in the report; the score is not a calibrated probability. The formula is versioned as `pathguard-v1`.
 
 Every source evidence record currently uses `reachabilityStatus: "not-proven"`. A static import or call reference indicates potential source usage only; it does not establish that the vulnerable function is reachable at runtime or that an exploit condition is satisfied. Missing evidence must not be interpreted as proof that a dependency is safe. Each finding also has `sourceEvidenceAssessment.status`: `vulnerable-symbol-observed` means a call reference matches a reviewed mapping; `no-matching-symbol-evidence` means the current analyzer did not find that symbol; `no-curated-symbol-mapping` means the symbol-level status is unknown. None of these statuses proves runtime reachability or exploitability. The initial mapping is deliberately small and must be expanded only with cited, reviewed advisory-to-symbol evidence.
+
+## Reproducible benchmark scans
+
+For each benchmark repository, scan its pinned commit and include metadata used by the evaluator:
+
+```powershell
+npm run scan -- --lockfile ".\\benchmarks\\repo-a\\package-lock.json" --source ".\\benchmarks\\repo-a" --repo-url "https://github.com/OWNER/REPOSITORY" --commit "FULL_40_CHARACTER_COMMIT_SHA" --out ".\\research\\scan-reports\\repo-a.json"
+```
+
+Use the repository URL and commit recorded in the label CSV exactly. Store one report per repository commit. Evaluate the whole directory with `npm run evaluate:benchmark -- --reports-dir ".\\research\\scan-reports" --labels ".\\research\\labeled-cases.csv" --out ".\\research\\metrics.json" --k 5`. The evaluator requires repository URL and commit metadata and will not match a case against a report from another repository/commit.
