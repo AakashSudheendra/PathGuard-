@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "1.0",
+  "tool": {
+    "name": "PathGuard",
+    "version": "0.1.0"
+  },
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "findings": [
+    {
+      "name": "example-a",
+      "version": "1.0.0",
+      "vulnerability": {
+        "id": "GHSA-example-a",
+        "aliases": [
+          "CVE-2024-1111"
+        ],
+        "severity": [
+          {
+            "type": "CVSS_V3",
+            "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          }
+        ],
+        "epssByCve": [
+          {
+            "cve": "CVE-2024-1111",
+            "score": {
+              "cve": "CVE-2024-1111",
+              "score": 0.8,
+              "percentile": 0.99
+            }
+          }
+        ]
+      },
+      "ranking": {
+        "cvssBaseScore": 9.8,
+        "epssProbability": 0.8,
+        "priorityScore": 85,
+        "formulaVersion": "pathguard-v1"
+      }
+    },
+    {
+      "name": "example-b",
+      "version": "2.0.0",
+      "vulnerability": {
+        "id": "GHSA-example-b",
+        "aliases": [
+          "CVE-2024-2222"
+        ],
+        "severity": [
+          {
+            "type": "CVSS_V3",
+            "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:N"
+          }
+        ],
+        "epssByCve": [
+          {
+            "cve": "CVE-2024-2222",
+            "score": {
+              "cve": "CVE-2024-2222",
+              "score": 0.1,
+              "percentile": 0.5
+            }
+          }
+        ]
+      },
+      "ranking": {
+        "cvssBaseScore": 5.4,
+        "epssProbability": 0.1,
+        "priorityScore": 35,
+        "formulaVersion": "pathguard-v1"
+      }
+    },
+    {
+      "name": "example-c",
+      "version": "3.0.0",
+      "vulnerability": {
+        "id": "GHSA-example-c",
+        "aliases": [
+          "CVE-2024-3333"
+        ],
+        "severity": [],
+        "epssByCve": [
+          {
+            "cve": "CVE-2024-3333",
+            "score": null
+          }
+        ]
+      },
+      "ranking": {
+        "cvssBaseScore": null,
+        "epssProbability": null,
+        "priorityScore": 0,
+        "formulaVersion": "pathguard-v1"
+      }
+    }
+  ],
+  "input": {
+    "repositoryUrl": "https://example.invalid/synthetic-repository",
+    "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}
