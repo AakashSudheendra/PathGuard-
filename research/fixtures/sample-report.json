@@ -93,5 +93,9 @@
         "formulaVersion": "pathguard-v1"
       }
     }
-  ]
+  ],
+  "input": {
+    "repositoryUrl": "https://example.invalid/synthetic-repository",
+    "repositoryCommit": "synthetic"
+  }
 }
