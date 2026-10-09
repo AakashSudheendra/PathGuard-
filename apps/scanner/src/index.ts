@@ -64,6 +64,15 @@ function parseArgs(argv: string[]): { lockfile: string; out: string; limit: numb
       throw new Error(`Unknown or incomplete argument: ${arg}. Use --help.`);
     }
   }
+  if (Boolean(repositoryUrl) !== Boolean(repositoryCommit)) {
+    throw new Error("--repo-url and --commit must be supplied together.");
+  }
+  if (repositoryUrl) {
+    let parsedUrl: URL;
+    try { parsedUrl = new URL(repositoryUrl); } catch { throw new Error("--repo-url must be a valid HTTP(S) URL."); }
+    if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") throw new Error("--repo-url must use HTTP or HTTPS.");
+    if (!/^[a-f0-9]{40}$/i.test(repositoryCommit ?? "")) throw new Error("--commit must be a full 40-character Git commit SHA.");
+  }
   // Resolve CLI paths from the directory where npm was invoked, not the workspace script directory.
   const invocationRoot = resolve(process.env.INIT_CWD ?? process.cwd());
   const resolvedLockfile = resolve(invocationRoot, lockfile);
