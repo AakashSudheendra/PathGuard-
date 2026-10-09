@@ -63,10 +63,10 @@ Evaluation should compare at least CVSS-only, EPSS-only, existing scanner output
 
 ## Benchmark evaluation
 
-Use the benchmark evaluator with a scan report and independently reviewed labels:
+Use the benchmark evaluator with a scan report and independently reviewed labels. To add a third-party baseline, provide a complete `case_id,score` CSV (higher scores rank first), including score `0` for cases it did not flag:
 
 ```powershell
-npm run evaluate:benchmark -- --report ".\\pathguard-results.json" --labels ".\\research\\benchmark-label-template.csv" --out ".\\research\\metrics.json" --k 5
+npm run evaluate:benchmark -- --report ".\\pathguard-results.json" --labels ".\\research\\labeled-cases.csv" --external-ranking ".\\research\\external-scores.csv" --external-name "OSV-Scanner" --out ".\\research\\metrics.json" --k 5
 ```
 
 The template is empty by design, so create a populated copy before evaluation. See [the benchmark protocol](docs/BENCHMARK_PROTOCOL.md). Never present the synthetic CI fixture as empirical evidence.
