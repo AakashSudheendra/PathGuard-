@@ -56,8 +56,15 @@ function parseArgs(argv: string[]): { lockfile: string; out: string; limit: numb
       throw new Error(`Unknown or incomplete argument: ${arg}. Use --help.`);
     }
   }
-  const resolvedLockfile = resolve(lockfile);
-  return { lockfile: resolvedLockfile, out: resolve(out), limit, sourceRoot: resolve(sourceRoot ?? dirname(resolvedLockfile)) };
+  // Resolve CLI paths from the directory where npm was invoked, not the workspace script directory.
+  const invocationRoot = resolve(process.env.INIT_CWD ?? process.cwd());
+  const resolvedLockfile = resolve(invocationRoot, lockfile);
+  return {
+    lockfile: resolvedLockfile,
+    out: resolve(invocationRoot, out),
+    limit,
+    sourceRoot: resolve(invocationRoot, sourceRoot ?? dirname(resolvedLockfile))
+  };
 }
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
