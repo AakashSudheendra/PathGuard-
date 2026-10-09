@@ -13,3 +13,7 @@ This folder is the home for benchmark protocols, dataset documentation, and repr
 7. Keep raw third-party datasets out of Git where licensing or size makes that inappropriate; document download and version steps.
 
 Current source-level import/call evidence is preliminary. A syntax-tree match is not call-graph reachability, and neither establishes execution of a vulnerable path condition.
+
+## Advisory-specific source evidence
+
+PathGuard uses an explicitly curated mapping from a CVE and package to a vulnerable symbol when such a mapping has been reviewed. The current prototype includes one lodash mapping for CVE-2021-23337, with the NVD advisory as its reference. This is intentionally narrow: unlisted advisories remain unknown, and matching a call reference is not proof of runtime reachability or exploitability. Expand this mapping only with documented, independently reviewed evidence.
