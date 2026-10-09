@@ -70,6 +70,8 @@ The output path is relative to the current directory unless you provide an absol
 - [Research workspace](research/README.md): dataset and evaluation guidance.
 - [Initial seed-cohort report](research/SEED_COHORT_COLLECTION.md): original seven-repository seed statistics and limitations.
 - [Expanded nine-repository collection report](research/EXPANDED_COHORT_COLLECTION.md): latest raw scan counts, baseline coverage, candidate counts, and limitations.
+- [Review brief](research/REVIEW_TOMORROW_BRIEF.md): concise project explanation, observed results, review Q&A, and remaining work.
+- [Google Colab benchmark analysis notebook](research/PathGuard_Benchmark_Analysis.ipynb): reproducible descriptive analysis and guarded metric calculations for independently labeled cases.
 - [Research limitations](docs/RESEARCH_LIMITATIONS.md): scope and claims the current implementation cannot support.
 
 ## Collect and prepare benchmark candidates
