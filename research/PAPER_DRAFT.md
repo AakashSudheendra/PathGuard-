@@ -1,6 +1,6 @@
 # Evidence-Guided Prioritization of Vulnerable npm Dependencies: PathGuard Prototype and Evaluation Protocol
 
-> **Manuscript status: draft / not ready for submission.** The implementation and evaluator exist, but the empirical benchmark, independent labels, full baseline runs, and measured results are not yet available. Replace every `[TO FILL]` item with results from a reproducible experiment. Do not submit with placeholders or claim an improvement without evidence.
+> **Manuscript status: draft / not ready for submission.** The seven-repository seed cohort has scan reports and a provisional OSV-Scanner detection-plus-CVSS baseline, but independent labels and measured comparative ranking results are not yet available. Replace every `[TO FILL]` item with results from a reproducible experiment. Do not submit with placeholders or claim an improvement without evidence.
 
 ## Abstract
 
@@ -92,7 +92,7 @@ A missing import, a failed text search, or a missing curated mapping is not suff
 
 ### 4.3 Baselines
 
-Compare CVSS-only, EPSS-only, and PathGuard v1 on the same case set. Add OSV-Scanner or another established scanner where versions, invocation, configuration, and outputs can be preserved. Report mismatched or unsupported cases rather than silently dropping them.
+Compare CVSS-only, EPSS-only, and PathGuard v1 on the same case set. The seed workflow also runs OSV-Scanner v2.6.0 on the same pinned lockfiles. Because OSV-Scanner does not provide an intrinsic priority score, the exported external baseline assigns each flagged case the maximum CVSS base score reported by OSV-Scanner, and assigns 0 to cases it does not flag. A flagged case without parseable CVSS also receives 0 and is marked in `score_source`. This is a constructed detection-plus-severity baseline, not OSV-Scanner's own ranking method. Report mismatched or unsupported cases rather than silently dropping them.
 
 ### 4.4 Metrics and statistical reporting
 
@@ -107,7 +107,7 @@ Report coverage, precision@k, recall@k, nDCG@k, runtime, API failures, and unmat
 | CVSS-only | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
 | EPSS-only | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
 | PathGuard v1 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| Established scanner (if included) | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
+| OSV-Scanner detection + CVSS severity (constructed baseline) | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
 
 ### 4.6 Error analysis
 
