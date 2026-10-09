@@ -13,7 +13,8 @@
     "scan:fixture": "npm --workspace @pathguard/scanner run scan:fixture",
     "dev:scan": "npm --workspace @pathguard/scanner run dev --",
     "evaluate:benchmark": "tsx research/evaluate-benchmark.ts",
-    "build:candidates": "tsx research/build-candidate-manifest.ts"
+    "build:candidates": "tsx research/build-candidate-manifest.ts",
+    "build:osv-scores": "tsx research/build-osv-scores.ts"
   },
   "engines": {
     "node": ">=20"
