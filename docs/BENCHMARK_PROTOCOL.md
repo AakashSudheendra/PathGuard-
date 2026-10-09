@@ -37,7 +37,7 @@ For each method, report:
 - deterministic bootstrap percentile 95% interval for nDCG@k where enough labeled cases and positive cases exist;
 - runtime, API failure count, and any skipped or unmatched cases.
 
-The evaluator excludes `unknown` from ranking metrics and reports it separately. Unmatched label rows are excluded from the matched-case metrics but included in coverage denominator. Always report these exclusions. If there are no positive reachable cases, recall and nDCG are undefined and must not be reported as zero performance.
+The evaluator excludes `unknown` from ranking metrics and reports it separately. A labeled `reachable` or `not_reachable` case absent from the scan report receives score zero for all methods and remains in the ranking denominator; this makes ranking metrics reflect end-to-end detection plus prioritization. Report matched coverage and unmatched case IDs separately. If there are no positive reachable cases, recall and nDCG are undefined and must not be reported as zero performance.
 
 ## Reproducibility
 
