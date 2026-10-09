@@ -12,13 +12,15 @@ This checklist distinguishes software completion from evidence needed to support
 - [x] Versioned, explainable `pathguard-v1` ranking factors.
 - [x] Benchmark evaluator for CVSS-only, EPSS-only, PathGuard, and optional external scores.
 - [x] Label validation for unique IDs, identifiers, allowed labels, and reviewer disagreement notes.
-- [x] CI build, unit tests, and synthetic benchmark evaluator smoke test.
+- [x] Deterministic unlabeled candidate-manifest generator for real scan reports.
+- [x] CI build, unit tests, and synthetic evaluator/candidate-generator smoke tests.
 - [x] Research protocol and manuscript draft with explicit placeholders.
 
 ## Empirical work required before submission
 
 - [ ] Define and freeze case-selection criteria before examining final rankings.
 - [ ] Curate a sufficiently large, diverse set of public npm repositories and pinned commits.
+- [ ] Generate candidate cases from real scans and manually verify the package/advisory/function mapping.
 - [ ] Expand advisory-to-symbol mappings using cited sources and independent review.
 - [ ] Independently label cases as `reachable`, `not_reachable`, or `unknown`; preserve both reviewers' labels and adjudication rationale.
 - [ ] Run PathGuard and preserve scan reports, warnings, API retrieval dates, tool commit, Node/npm versions, and EPSS dates.
