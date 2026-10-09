@@ -71,6 +71,20 @@ jobs:
           ref: alpha
           path: targets/parse-server
           persist-credentials: false
+      - name: Checkout pinned Socket.IO repository
+        uses: actions/checkout@v4
+        with:
+          repository: socketio/socket.io
+          ref: main
+          path: targets/socketio
+          persist-credentials: false
+      - name: Checkout pinned NestJS repository
+        uses: actions/checkout@v4
+        with:
+          repository: nestjs/nest
+          ref: master
+          path: targets/nest
+          persist-credentials: false
       - name: Verify immutable source commits
         shell: bash
         run: |
@@ -81,6 +95,8 @@ jobs:
           test "$(git -C targets/yargs rev-parse HEAD)" = "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8"
           test "$(git -C targets/node-red rev-parse HEAD)" = "935b8d3e12ec8be064f3a72ac6547131f778a7b1"
           test "$(git -C targets/parse-server rev-parse HEAD)" = "304c1a5d4e752958c7c9b41425fe1ee546111fc6"
+          test "$(git -C targets/socketio rev-parse HEAD)" = "1eaa582d3b453e3e6f522300ed05b10da0a0799b"
+          test "$(git -C targets/nest rev-parse HEAD)" = "2731c18054fb348779311d81e4e20949e313be78"
       - name: Install pinned OSV-Scanner
         shell: bash
         run: |
@@ -104,6 +120,10 @@ jobs:
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/node-red/package-lock.json" --source "$GITHUB_WORKSPACE/targets/node-red/packages" --repo-url "https://github.com/node-red/node-red" --commit "935b8d3e12ec8be064f3a72ac6547131f778a7b1" --out "$GITHUB_WORKSPACE/research/scan-reports/node-red.json" --limit 3000
       - name: Scan Parse Server with PathGuard
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/parse-server/package-lock.json" --source "$GITHUB_WORKSPACE/targets/parse-server/src" --repo-url "https://github.com/parse-community/parse-server" --commit "304c1a5d4e752958c7c9b41425fe1ee546111fc6" --out "$GITHUB_WORKSPACE/research/scan-reports/parse-server.json" --limit 3000
+      - name: Scan Socket.IO with PathGuard
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/socketio/package-lock.json" --source "$GITHUB_WORKSPACE/targets/socketio/packages" --repo-url "https://github.com/socketio/socket.io" --commit "1eaa582d3b453e3e6f522300ed05b10da0a0799b" --out "$GITHUB_WORKSPACE/research/scan-reports/socketio.json" --limit 3000
+      - name: Scan NestJS with PathGuard
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/nest/package-lock.json" --source "$GITHUB_WORKSPACE/targets/nest/packages" --repo-url "https://github.com/nestjs/nest" --commit "2731c18054fb348779311d81e4e20949e313be78" --out "$GITHUB_WORKSPACE/research/scan-reports/nest.json" --limit 3000
       - name: Run OSV-Scanner baseline on pinned lockfiles
         shell: bash
         run: |
@@ -131,6 +151,8 @@ jobs:
           scan_osv yargs https://github.com/yargs/yargs b2dbcc538062829bd720f8cbfb6b4765bae6b4b8 "$GITHUB_WORKSPACE/targets/yargs/package-lock.json"
           scan_osv node-red https://github.com/node-red/node-red 935b8d3e12ec8be064f3a72ac6547131f778a7b1 "$GITHUB_WORKSPACE/targets/node-red/package-lock.json"
           scan_osv parse-server https://github.com/parse-community/parse-server 304c1a5d4e752958c7c9b41425fe1ee546111fc6 "$GITHUB_WORKSPACE/targets/parse-server/package-lock.json"
+          scan_osv socketio https://github.com/socketio/socket.io 1eaa582d3b453e3e6f522300ed05b10da0a0799b "$GITHUB_WORKSPACE/targets/socketio/package-lock.json"
+          scan_osv nest https://github.com/nestjs/nest 2731c18054fb348779311d81e4e20949e313be78 "$GITHUB_WORKSPACE/targets/nest/package-lock.json"
       - name: Generate union candidate manifest
         run: npm run build:candidates -- --reports-dir "$GITHUB_WORKSPACE/research/scan-reports" --external-reports-dir "$GITHUB_WORKSPACE/research/osv-scanner-reports" --out "$GITHUB_WORKSPACE/research/benchmark-candidates.csv"
       - name: Generate OSV-Scanner CVSS baseline scores
@@ -154,7 +176,9 @@ jobs:
               "https://github.com/markedjs/marked": "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c",
               "https://github.com/yargs/yargs": "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8",
               "https://github.com/node-red/node-red": "935b8d3e12ec8be064f3a72ac6547131f778a7b1",
-              "https://github.com/parse-community/parse-server": "304c1a5d4e752958c7c9b41425fe1ee546111fc6"
+              "https://github.com/parse-community/parse-server": "304c1a5d4e752958c7c9b41425fe1ee546111fc6",
+              "https://github.com/socketio/socket.io": "1eaa582d3b453e3e6f522300ed05b10da0a0799b",
+              "https://github.com/nestjs/nest": "2731c18054fb348779311d81e4e20949e313be78"
             },
             "labelStatus": "unreviewed; no ground-truth labels assigned",
             "mappingInventory": "four lodash, three provisional Busboy, and one GraphQL utility mapping",
@@ -164,7 +188,7 @@ jobs:
       - name: Validate candidate review artifact
         shell: bash
         run: |
-          node -e 'const fs=require("fs"); const m=JSON.parse(fs.readFileSync("research/experiment-manifest.json","utf8")); const c=fs.readFileSync("research/benchmark-candidates.csv","utf8"); const s=fs.readFileSync("research/osv-scanner-scores.csv","utf8"); const r=fs.readFileSync("research/review-packets/reviewer-1-blinded.csv","utf8"); const a=fs.readFileSync("research/review-packets/adjudication-template.csv","utf8"); if(!a.startsWith("case_id,label,disagreement_notes") || Object.keys(m.repositoryCommits||{}).length!==7 || m.labelStatus!=="unreviewed; no ground-truth labels assigned" || m.mappingInventory!=="four lodash, three provisional Busboy, and one GraphQL utility mapping" || !c.startsWith("case_id,repository_url,commit_sha") || !c.includes("advisory_summary,advisory_references") || !c.includes("discovery_source") || !s.startsWith("case_id,score,flagged") || !r.startsWith("case_id,repository_url,commit_sha") || r.split(String.fromCharCode(10))[0].includes("pathguard_score") || r.split(String.fromCharCode(10))[0].includes("source_assessment")) throw new Error("Benchmark review artifact validation failed");'
+          node -e 'const fs=require("fs"); const m=JSON.parse(fs.readFileSync("research/experiment-manifest.json","utf8")); const c=fs.readFileSync("research/benchmark-candidates.csv","utf8"); const s=fs.readFileSync("research/osv-scanner-scores.csv","utf8"); const r=fs.readFileSync("research/review-packets/reviewer-1-blinded.csv","utf8"); const a=fs.readFileSync("research/review-packets/adjudication-template.csv","utf8"); if(!a.startsWith("case_id,label,disagreement_notes") || Object.keys(m.repositoryCommits||{}).length!==9 || m.labelStatus!=="unreviewed; no ground-truth labels assigned" || m.mappingInventory!=="four lodash, three provisional Busboy, and one GraphQL utility mapping" || !c.startsWith("case_id,repository_url,commit_sha") || !c.includes("advisory_summary,advisory_references") || !c.includes("discovery_source") || !s.startsWith("case_id,score,flagged") || !r.startsWith("case_id,repository_url,commit_sha") || r.split(String.fromCharCode(10))[0].includes("pathguard_score") || r.split(String.fromCharCode(10))[0].includes("source_assessment")) throw new Error("Benchmark review artifact validation failed");'
       - name: Upload scan reports, baseline scores, and unlabeled candidates
         uses: actions/upload-artifact@v4
         with:
