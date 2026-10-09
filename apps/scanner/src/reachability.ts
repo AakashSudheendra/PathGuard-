@@ -94,7 +94,12 @@ export async function analyzeSourceUsage(projectRoot: string, installedPackages?
           symbol = node.expression.name.text;
         }
         const binding = localName ? bindings.get(localName) : undefined;
-        if (binding && (binding.importedSymbol === "*" || binding.importedSymbol === "default" || binding.importedSymbol === symbol)) {
+        if (binding && (
+          binding.importedSymbol === "*" ||
+          binding.importedSymbol === "default" ||
+          (symbol === undefined && binding.importedSymbol !== "*") ||
+          binding.importedSymbol === symbol
+        )) {
           const position = source.getLineAndCharacterOfPosition(node.expression.getStart(source));
           const expression = node.expression.getText(source);
           const item: SourceEvidence = {
