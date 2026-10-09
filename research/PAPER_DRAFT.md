@@ -1,6 +1,6 @@
 # Evidence-Guided Prioritization of Vulnerable npm Dependencies: PathGuard Prototype and Evaluation Protocol
 
-> **Manuscript status: draft / not ready for submission.** The seven-repository seed cohort has scan reports and a provisional OSV-Scanner detection-plus-CVSS baseline, but independent labels and measured comparative ranking results are not yet available. Replace every `[TO FILL]` item with results from a reproducible experiment. Do not submit with placeholders or claim an improvement without evidence.
+> **Manuscript status: draft / not ready for submission.** The original seven-repository seed cohort has scan reports and a provisional OSV-Scanner detection-plus-CVSS baseline. The collection workflow has now been expanded to nine pinned repositories; the expanded scan outputs, independent labels, and measured comparative ranking results must be checked before this manuscript can be considered for submission. Replace every `[TO FILL]` item with results from a reproducible experiment. Do not submit with placeholders or claim an improvement without evidence.
 
 ## Abstract
 
@@ -79,7 +79,7 @@ The formula is versioned as `pathguard-v1`. Missing CVSS or EPSS values remain n
 
 ### 4.1 Case selection
 
-The initial reproducible seed cohort comprises seven public npm repositories with pinned commits: Axios, Undici, npm CLI, Marked, Yargs, Node-RED, and Parse Server. It is a convenience sample selected for root npm lockfiles and inspectable source directories, not a representative sample of npm applications. The collection workflow runs PathGuard and OSV-Scanner v2.6.0 against the same pinned lockfiles and forms a union of detected cases. Broaden the cohort and disclose selection bias before making general claims. Select public repositories and vulnerable package/version cases using inclusion criteria fixed before looking at PathGuard rankings. Pin every repository to an immutable commit. Avoid selecting cases solely because the prototype already detects them. Deduplicate cases by repository commit, ecosystem, package/version, and advisory identifier.
+The original reproducible seed cohort comprised seven public npm repositories with pinned commits: Axios, Undici, npm CLI, Marked, Yargs, Node-RED, and Parse Server. The expanded collection workflow adds Socket.IO and NestJS at pinned commits. The combined nine-repository cohort remains a convenience sample selected for root npm lockfiles and inspectable source directories, not a representative sample of npm applications. The workflow runs PathGuard and OSV-Scanner v2.6.0 against the same pinned lockfiles and forms a union of detected cases. Further expansion and disclosure of selection bias are still required before making general claims. Select public repositories and vulnerable package/version cases using inclusion criteria fixed before looking at PathGuard rankings. Pin every repository to an immutable commit. Avoid selecting cases solely because the prototype already detects them. Deduplicate cases by repository commit, ecosystem, package/version, and advisory identifier.
 
 ### 4.2 Independent labels
 
