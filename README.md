@@ -77,7 +77,7 @@ The [public benchmark cohort](research/PUBLIC_BENCHMARK_COHORT.md) documents fiv
 For your own reports, generate a candidate CSV for independent review:
 
 ```powershell
-npm run build:candidates -- --reports-dir ".\research\scan-reports" --out ".\research\benchmark-candidates.csv"
+npm run build:candidates -- --reports-dir ".\research\scan-reports" --external-reports-dir ".\research\osv-scanner-reports" --out ".\research\benchmark-candidates.csv"
 ```
 
 This command merges package/version/advisory cases discovered by PathGuard and OSV-Scanner, deduplicates matching advisory identifiers, and creates stable IDs. It deliberately leaves all labels blank. Reviewers must verify the advisory, vulnerable function, source evidence, and call path, then independently assign labels and record adjudication. Generated candidates are not ground truth and must not be passed to the evaluator until they have been reviewed and completed. For a candidate CSV produced by the cohort workflow, the accompanying `osv-scanner-scores.csv` uses OSV-Scanner's reported CVSS severity for flagged cases and zero for unflagged cases; this is a detection-plus-severity baseline, not an intrinsic scanner priority score.
