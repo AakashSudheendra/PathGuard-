@@ -14,10 +14,14 @@ This repository starts with a reproducible npm scanner foundation. The scanner, 
 - [x] OSV advisory queries for npm lockfiles
 - [x] CVE alias enrichment and EPSS lookup
 - [x] Finding summaries and automated unit tests
+- [x] Versioned explainable ranking factors and CVSS v3.x vector parsing
+- [x] Advisory-specific curated vulnerable-symbol evidence
+- [x] Benchmark evaluator for CVSS-only, EPSS-only, and PathGuard ranking
 - [x] Source usage evidence integrated into findings
 - [ ] Dashboard
 - [ ] Language-aware call graph / reachability engine
-- [ ] Independently labeled benchmark and comparative evaluation
+- [ ] Real independently labeled benchmark and comparative evaluation
+- [x] Synthetic evaluator smoke test in CI
 
 ## Requirements
 
@@ -42,7 +46,7 @@ Scan a project containing `package-lock.json`:
 npm run scan -- --lockfile "C:\path\to\your\project\package-lock.json" --out "pathguard-results.json"
 ```
 
-The output path is relative to the current directory unless you provide an absolute path. The scanner sends package names and versions to OSV and sends discovered CVE identifiers to FIRST EPSS. Review your organization's data-handling requirements before scanning private projects.
+The output path is relative to the current directory unless you provide an absolute path. Each finding includes `ranking` with CVSS, EPSS, source-evidence contributions, total priority score, and formula version. The scanner sends package names and versions to OSV and sends discovered CVE identifiers to FIRST EPSS. Review your organization's data-handling requirements before scanning private projects.
 
 ## Workspace
 
@@ -54,6 +58,16 @@ The output path is relative to the current directory unless you provide an absol
 ## Research protocol
 
 Evaluation should compare at least CVSS-only, EPSS-only, existing scanner output, and PathGuard ranking on the same package/version cases. Define labels before looking at model rankings; separate reachable, not-reachable, and unknown/insufficient-evidence cases. Report precision/recall and ranking metrics with confidence intervals where appropriate, along with API failures, runtime, and coverage. Avoid treating missing evidence as proof of safety.
+
+## Benchmark evaluation
+
+Use the benchmark evaluator with a scan report and independently reviewed labels:
+
+```powershell
+npm run evaluate:benchmark -- --report ".\\pathguard-results.json" --labels ".\\research\\benchmark-label-template.csv" --out ".\\research\\metrics.json" --k 5
+```
+
+The template is empty by design, so create a populated copy before evaluation. See [the benchmark protocol](docs/BENCHMARK_PROTOCOL.md). Never present the synthetic CI fixture as empirical evidence.
 
 ## Data sources
 
