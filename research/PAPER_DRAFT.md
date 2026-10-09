@@ -100,14 +100,16 @@ Report coverage, precision@k, recall@k, nDCG@k, runtime, API failures, and unmat
 
 ### 4.5 Results
 
-**Do not fill this table with synthetic CI data.** Run the evaluation on independently labeled cases and preserve the JSON outputs.
+**Preliminary descriptive results (collection only; not predictive evaluation).** The expanded run scanned nine pinned public repositories and checked 8,659 dependency entries. PathGuard recorded 430 raw advisory findings, which were deduplicated to 427 unique candidate cases. Both PathGuard and OSV-Scanner identified all 427 cases in the union candidate manifest; this collection therefore shows no retrieval difference between the two tools on this candidate set. OSV-Scanner provided a parseable CVSS base score for 334 cases (78.2%); 93 cases (21.8%) used the documented zero-score fallback because CVSS was unavailable. EPSS was available for 412 cases (96.5%) and unavailable for 15 (3.5%). Source mapping coverage remains limited: three cases have a provisional vulnerable-symbol match, three mapped cases have no matching symbol evidence, and 421 cases have no curated mapping. All 427 adjudicated labels remain blank.
 
-| Method | Cases evaluated | Coverage | Precision@k | Recall@k | nDCG@k (95% bootstrap CI) |
-|---|---:|---:|---:|---:|---:|
-| CVSS-only | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| EPSS-only | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| PathGuard v1 | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
-| OSV-Scanner detection + CVSS severity (constructed baseline) | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] | [TO FILL] |
+These figures describe collection and signal coverage only. They are **not** evidence of precision, recall, nDCG, accuracy, or improved prioritization. The seed is a convenience sample and the candidate pool is the union of two scanners, so vulnerabilities missed by both tools are not represented. See [the expanded collection report](EXPANDED_COHORT_COLLECTION.md) and the reproducible [Google Colab analysis notebook](PathGuard_Benchmark_Analysis.ipynb).
+
+| Research evaluation | Status |
+|---|---|
+| Independently adjudicated cases | Pending; no ground-truth labels assigned |
+| CVSS-only vs EPSS-only vs PathGuard v1 | Not yet measurable without reviewed labels |
+| OSV-Scanner detection + CVSS baseline comparison | Descriptive score export collected; ranking metrics pending |
+| Precision@k, recall@k, nDCG@k and confidence intervals | Intentionally not reported until labels and adjudication are complete |
 
 ### 4.6 Error analysis
 
