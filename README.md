@@ -68,12 +68,13 @@ The output path is relative to the current directory unless you provide an absol
 - [Publication checklist](research/PUBLICATION_CHECKLIST.md): separates completed engineering from required empirical work.
 - [Benchmark protocol](docs/BENCHMARK_PROTOCOL.md): case selection, independent labels, baselines, metrics, and reproducibility.
 - [Research workspace](research/README.md): dataset and evaluation guidance.
-- [Initial seed-cohort report](research/SEED_COHORT_COLLECTION.md): collected scan counts, baseline coverage, mapping coverage, and limitations.
+- [Initial seed-cohort report](research/SEED_COHORT_COLLECTION.md): original seven-repository seed statistics and limitations.
+- [Expanded nine-repository collection report](research/EXPANDED_COHORT_COLLECTION.md): latest raw scan counts, baseline coverage, candidate counts, and limitations.
 - [Research limitations](docs/RESEARCH_LIMITATIONS.md): scope and claims the current implementation cannot support.
 
 ## Collect and prepare benchmark candidates
 
-The [public benchmark cohort](research/PUBLIC_BENCHMARK_COHORT.md) documents five pinned repositories and the workflow that scans them with PathGuard and OSV-Scanner v2.6.0. The workflow uploads immutable scan reports, OSV-Scanner outputs, a union candidate CSV, an OSV-Scanner CVSS baseline score CSV, a reproducibility manifest, and two blinded review packets as a GitHub Actions artifact. The initial cohort is a seed convenience sample, not a representative benchmark.
+The [public benchmark cohort](research/PUBLIC_BENCHMARK_COHORT.md) documents nine pinned repositories and the workflow that scans them with PathGuard and OSV-Scanner v2.6.0. The latest collection checked 8,659 dependency entries and generated 427 unique unlabeled cases. It uploads immutable scan reports, OSV-Scanner outputs, a union candidate CSV, an OSV-Scanner CVSS baseline score CSV, a reproducibility manifest, and two blinded review packets as a GitHub Actions artifact. The cohort remains a convenience sample, not a representative benchmark.
 
 For your own reports, generate a candidate CSV for independent review:
 
