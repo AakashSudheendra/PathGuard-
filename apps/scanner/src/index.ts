@@ -153,7 +153,8 @@ async function run(): Promise<void> {
     const epss = vulnerability!.epssByCve;
     const presentScores = epss.flatMap((entry) => entry.score ? [entry.score.score] : []);
     return {
-      ...finding,
+      name: finding.name,
+      version: finding.version,
       vulnerability: vulnerability!,
       epss,
       maxEpssScore: presentScores.length ? Math.max(...presentScores) : null
