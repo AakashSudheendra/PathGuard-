@@ -72,7 +72,7 @@ The output path is relative to the current directory unless you provide an absol
 
 ## Collect and prepare benchmark candidates
 
-The [public benchmark cohort](research/PUBLIC_BENCHMARK_COHORT.md) documents five pinned repositories and the workflow that scans them with PathGuard and OSV-Scanner v2.6.0. The workflow uploads immutable scan reports, OSV-Scanner outputs, a union candidate CSV, and an OSV-Scanner CVSS baseline score CSV as a GitHub Actions artifact. The initial cohort is a seed convenience sample, not a representative benchmark.
+The [public benchmark cohort](research/PUBLIC_BENCHMARK_COHORT.md) documents five pinned repositories and the workflow that scans them with PathGuard and OSV-Scanner v2.6.0. The workflow uploads immutable scan reports, OSV-Scanner outputs, a union candidate CSV, an OSV-Scanner CVSS baseline score CSV, a reproducibility manifest, and two blinded review packets as a GitHub Actions artifact. The initial cohort is a seed convenience sample, not a representative benchmark.
 
 For your own reports, generate a candidate CSV for independent review:
 
@@ -90,7 +90,7 @@ After review, evaluate the labeled CSV and optionally include an external baseli
 npm run evaluate:benchmark -- --reports-dir ".\research\scan-reports" --labels ".\research\labeled-cases.csv" --external-ranking ".\research\external-scores.csv" --external-name "OSV-Scanner" --out ".\research\metrics.json" --k 5
 ```
 
-The label template is empty by design. The external score CSV must include every labeled case, assigning score `0` to cases not flagged by the external tool. See the [benchmark protocol](docs/BENCHMARK_PROTOCOL.md). Never present the synthetic CI fixture as empirical evidence.
+The label template is empty by design. The two blinded reviewer packets intentionally omit system scores and source-analysis output; give one to each independent reviewer and do not share decisions until both are complete. After adjudication, merge the completed files with `npm run merge:review-labels -- --candidates ".\\research\\benchmark-candidates.csv" --reviewer-1 ".\\research\\reviewer-1-blinded.csv" --reviewer-2 ".\\research\\reviewer-2-blinded.csv" --adjudication ".\\research\\adjudication.csv" --out ".\\research\\labeled-cases.csv"`. The adjudication CSV must contain `case_id,label,disagreement_notes` for every candidate. The external score CSV must include every labeled case, assigning score `0` to cases not flagged by the external tool. See the [benchmark protocol](docs/BENCHMARK_PROTOCOL.md). Never present the synthetic CI fixture as empirical evidence.
 
 ## Data sources
 
