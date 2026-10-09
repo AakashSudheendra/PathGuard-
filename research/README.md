@@ -19,3 +19,4 @@ Current source-level import/call evidence is preliminary. A syntax-tree match is
 ## Advisory-specific source evidence
 
 PathGuard uses an explicitly curated mapping from a CVE and package to a vulnerable symbol when such a mapping has been reviewed. The current prototype includes one lodash mapping for CVE-2021-23337, with the NVD advisory as its reference. This is intentionally narrow: unlisted advisories remain unknown, and matching a call reference is not proof of runtime reachability or exploitability. Expand this mapping only with documented, independently reviewed evidence.
+\n\nThe evaluator validates unique case IDs, required package/version/advisory identifiers, allowed label values, and records reviewer/adjudicated disagreements only when accompanied by a note. Keep the raw reviewer labels rather than overwriting them with the final adjudication.\n
