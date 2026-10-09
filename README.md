@@ -14,7 +14,7 @@ This repository starts with a reproducible npm scanner foundation. The scanner, 
 - [x] OSV advisory queries for npm lockfiles
 - [x] CVE alias enrichment and EPSS lookup
 - [x] Finding summaries and automated unit tests
-- [ ] Source usage evidence integrated into findings
+- [x] Source usage evidence integrated into findings
 - [ ] Dashboard
 - [ ] Language-aware call graph / reachability engine
 - [ ] Independently labeled benchmark and comparative evaluation
