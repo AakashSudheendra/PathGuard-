@@ -96,6 +96,6 @@
   ],
   "input": {
     "repositoryUrl": "https://example.invalid/synthetic-repository",
-    "repositoryCommit": "synthetic"
+    "repositoryCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   }
 }
