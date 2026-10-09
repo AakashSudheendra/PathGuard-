@@ -26,39 +26,47 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: axios/axios
-          ref: 1a94bdbdf0518f3adbeada510b747aff80847ed
+          ref: v1.x
           path: targets/axios
           persist-credentials: false
       - name: Checkout pinned Undici repository
         uses: actions/checkout@v4
         with:
           repository: nodejs/undici
-          ref: e960331c83346ce770a7a58d7cfb6afb4aec0ccf
+          ref: main
           path: targets/undici
           persist-credentials: false
       - name: Checkout pinned npm CLI repository
         uses: actions/checkout@v4
         with:
           repository: npm/cli
-          ref: b317f16c80df02ea3628cfa77170d5ae9b59720c
+          ref: latest
           path: targets/npm-cli
           persist-credentials: false
       - name: Checkout pinned Marked repository
         uses: actions/checkout@v4
         with:
           repository: markedjs/marked
-          ref: eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c
+          ref: master
           path: targets/marked
           persist-credentials: false
       - name: Checkout pinned Yargs repository
         uses: actions/checkout@v4
         with:
           repository: yargs/yargs
-          ref: b2dbcc538062829bd720f8cbfb6b4765bae6b4b8
+          ref: main
           path: targets/yargs
           persist-credentials: false
+      - name: Verify immutable source commits
+        shell: bash
+        run: |
+          test "$(git -C targets/axios rev-parse HEAD)" = "1a94bdbdf0518f3adbeada510b747aff80847ed7"
+          test "$(git -C targets/undici rev-parse HEAD)" = "e960331c83346ce770a7a58d7cfb6afb4aec0ccf"
+          test "$(git -C targets/npm-cli rev-parse HEAD)" = "b317f16c80df02ea3628cfa77170d5ae9b59720c"
+          test "$(git -C targets/marked rev-parse HEAD)" = "eaa1fffb30fa334cc11ab93f1e5aaa1d2b916e7c"
+          test "$(git -C targets/yargs rev-parse HEAD)" = "b2dbcc538062829bd720f8cbfb6b4765bae6b4b8"
       - name: Scan Axios
-        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/axios/package-lock.json" --source "$GITHUB_WORKSPACE/targets/axios/lib" --repo-url "https://github.com/axios/axios" --commit "1a94bdbdf0518f3adbeada510b747aff80847ed" --out "$GITHUB_WORKSPACE/research/scan-reports/axios.json" --limit 2000
+        run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/axios/package-lock.json" --source "$GITHUB_WORKSPACE/targets/axios/lib" --repo-url "https://github.com/axios/axios" --commit "1a94bdbdf0518f3adbeada510b747aff80847ed7" --out "$GITHUB_WORKSPACE/research/scan-reports/axios.json" --limit 2000
       - name: Scan Undici
         run: npm run scan -- --lockfile "$GITHUB_WORKSPACE/targets/undici/package-lock.json" --source "$GITHUB_WORKSPACE/targets/undici/lib" --repo-url "https://github.com/nodejs/undici" --commit "e960331c83346ce770a7a58d7cfb6afb4aec0ccf" --out "$GITHUB_WORKSPACE/research/scan-reports/undici.json" --limit 2000
       - name: Scan npm CLI
