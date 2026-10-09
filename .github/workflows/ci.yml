@@ -17,3 +17,5 @@ jobs:
       - run: npm test
       - run: npm run evaluate:benchmark -- --reports-dir research/fixtures/scan-reports --labels research/fixtures/sample-labels.csv --external-ranking research/fixtures/sample-external-scores.csv --external-name synthetic-external --out /tmp/pathguard-benchmark-metrics.json --k 2
       - run: node -e "const r=JSON.parse(require('fs').readFileSync('/tmp/pathguard-benchmark-metrics.json','utf8')); if(r.coverage.labelRows!==5 || r.coverage.matchedRows!==4 || r.coverage.unmatchedRows!==1 || r.metrics.length!==4 || r.metrics.some(m=>m.evaluatedCases!==4)) throw new Error('Benchmark evaluator smoke assertions failed');"
+      - run: npm run build:candidates -- --reports-dir research/fixtures/scan-reports --out /tmp/pathguard-candidates.csv
+      - run: node -e "const fs=require('fs'); const s=fs.readFileSync('/tmp/pathguard-candidates.csv','utf8'); const lines=s.trim().split(/\r?\n/); if(lines.length<2 || !lines[0].startsWith('case_id,repository_url,commit_sha') || !s.includes('UNREVIEWED candidate') || /,reachable,|,not_reachable,/.test(s)) throw new Error('Candidate manifest smoke assertions failed');"
