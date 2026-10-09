@@ -144,6 +144,16 @@ function parseArgs(argv: string[]) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const report = JSON.parse(await readFile(args.report,"utf8")) as ScanReport;
+  if (!Array.isArray(report.findings)) throw new Error("Scan report does not contain a findings array.");
+  const missingRanking = report.findings.filter((finding) =>
+    !finding.ranking ||
+    typeof finding.ranking.priorityScore !== "number" ||
+    typeof finding.ranking.cvssBaseScore === "undefined" ||
+    typeof finding.ranking.epssProbability === "undefined"
+  );
+  if (missingRanking.length) {
+    throw new Error("Scan report lacks PathGuard ranking fields. Regenerate it with a current PathGuard version before evaluating.");
+  }
   const labels = parseLabels(await readFile(args.labels,"utf8"));
   const results = labels.map((label) => ({label, result:scoreFor(label, report.findings ?? [])}));
   const matched = results.filter((x) => x.result !== null);
