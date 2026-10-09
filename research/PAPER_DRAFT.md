@@ -53,7 +53,7 @@ This analysis is not a whole-program call graph. It does not comprehensively res
 
 ### 3.3 Advisory-to-symbol evidence
 
-The prototype contains a manually curated mapping for lodash and CVE-2021-23337. A match means that a detected call reference matches a reviewed symbol hint for the advisory. No matching evidence is not proof of non-reachability; no mapping means the symbol-level status is unknown. Expand mappings only with a cited reference, rationale, and review record.
+The prototype contains four manually curated lodash mappings for CVE-2021-23337, CVE-2020-8203, CVE-2020-28500, and CVE-2019-10744, each with an NVD reference and rationale. A match means that a detected call reference matches a reviewed symbol hint for the advisory. No matching evidence is not proof of non-reachability; no mapping means the symbol-level status is unknown. Expand mappings only with a cited reference, rationale, and review record.
 
 ### 3.4 PathGuard v1 score
 
