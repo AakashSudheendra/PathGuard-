@@ -12,7 +12,7 @@ This folder is the home for benchmark protocols, dataset documentation, and repr
 6. Report precision@k, recall@k, nDCG@k, coverage, runtime, failed queries, and confidence intervals where sample size supports them.
 7. Keep raw third-party datasets out of Git where licensing or size makes that inappropriate; document download and version steps.
 
-The repository includes `research/evaluate-benchmark.ts`, a deterministic evaluator for CVSS-only, EPSS-only, and PathGuard v1 rankings. It reports label coverage, precision@k, recall@k, nDCG@k, and a deterministic bootstrap percentile interval for nDCG@k. A synthetic fixture is used only to smoke-test the evaluator in CI; it is not an experiment and must never be cited as a result.
+The repository includes `research/evaluate-benchmark.ts`, a deterministic evaluator for CVSS-only, EPSS-only, PathGuard v1, and optional external ranking scores. It reports label coverage, precision@k, recall@k, nDCG@k, and a deterministic bootstrap percentile interval for nDCG@k. A synthetic fixture is used only to smoke-test the evaluator in CI; it is not an experiment and must never be cited as a result.
 
 Current source-level import/call evidence is preliminary. A syntax-tree match is not call-graph reachability, and neither establishes execution of a vulnerable path condition.
 
