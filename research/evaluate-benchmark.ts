@@ -18,7 +18,7 @@ interface Finding {
   ranking?: { cvssBaseScore: number | null; epssProbability: number | null; priorityScore: number; formulaVersion: string };
 }
 interface ScanReport { findings: Finding[]; generatedAt?: string; tool?: {name?: string; version?: string}; }
-interface CaseResult { caseId: string; label: Exclude<Label, "unknown">; scores: Record<"cvss-only" | "epss-only" | "pathguard-v1", number>; }
+interface CaseResult { caseId: string; label: Exclude<Label, "unknown">; scores: Record<string, number>; }
 interface MetricResult {
   method: string;
   evaluatedCases: number;
@@ -82,6 +82,25 @@ function ids(value: string): Set<string> {
 function findingIds(finding: Finding): Set<string> {
   return new Set([finding.vulnerability.id ?? "", ...(finding.vulnerability.aliases ?? [])].map((x) => x.toUpperCase()).filter(Boolean));
 }
+function parseExternalScores(text: string, labels: LabelRow[]): Map<string, number> {
+  const rows = parseCsv(text);
+  const headers = rows.shift()?.map((x) => x.trim()) ?? [];
+  if (!headers.includes("case_id") || !headers.includes("score")) {
+    throw new Error("External ranking CSV must contain case_id,score columns.");
+  }
+  const scores = new Map<string, number>();
+  for (let i = 0; i < rows.length; i++) {
+    const values = Object.fromEntries(headers.map((header, j) => [header, rows[i]?.[j] ?? ""]));
+    const caseId = String(values.case_id ?? "").trim();
+    const score = Number(values.score);
+    if (!caseId || !Number.isFinite(score)) throw new Error(`Invalid external ranking row ${i + 2}: case_id and finite numeric score are required.`);
+    if (scores.has(caseId)) throw new Error(`Duplicate external ranking case_id: ${caseId}`);
+    scores.set(caseId, score);
+  }
+  const missing = labels.filter((label) => !scores.has(label.case_id)).map((label) => label.case_id);
+  if (missing.length) throw new Error(`External ranking CSV must include every labeled case, using score 0 for cases not flagged by the external tool. Missing: ${missing.slice(0, 10).join(", ")}`);
+  return scores;
+}
 function scoreFor(label: LabelRow, findings: Finding[]): CaseResult | null {
   const wanted = new Set([...ids(label.osv_ids), ...ids(label.cve_ids)]);
   if (!wanted.size) return null;
@@ -108,14 +127,14 @@ function scoreFor(label: LabelRow, findings: Finding[]): CaseResult | null {
 function dcg(relevances: number[]): number {
   return relevances.reduce((sum, relevance, i) => sum + (Math.pow(2, relevance) - 1) / Math.log2(i + 2), 0);
 }
-function ndcgAtK(rows: CaseResult[], method: keyof CaseResult["scores"], k: number): number | null {
+function ndcgAtK(rows: CaseResult[], method: string, k: number): number | null {
   if (!rows.length) return null;
   const ranked = [...rows].sort((a,b) => b.scores[method] - a.scores[method] || a.caseId.localeCompare(b.caseId));
   const observed = dcg(ranked.slice(0,k).map((x) => x.label === "reachable" ? 1 : 0));
   const ideal = dcg([...rows].map((x) => x.label === "reachable" ? 1 : 0).sort((a,b) => b-a).slice(0,k));
   return ideal === 0 ? null : observed / ideal;
 }
-function metrics(rows: CaseResult[], method: keyof CaseResult["scores"], k: number): MetricResult {
+function metrics(rows: CaseResult[], method: string, k: number): MetricResult {
   const ranked = [...rows].sort((a,b) => b.scores[method] - a.scores[method] || a.caseId.localeCompare(b.caseId));
   const top = ranked.slice(0, Math.min(k, ranked.length));
   const positives = rows.filter((x) => x.label === "reachable").length;
@@ -130,7 +149,7 @@ function metrics(rows: CaseResult[], method: keyof CaseResult["scores"], k: numb
     ndcgAtKBootstrap95CI: bootstrapNdcg(rows, method, k)
   };
 }
-function bootstrapNdcg(rows: CaseResult[], method: keyof CaseResult["scores"], k: number): [number, number] | null {
+function bootstrapNdcg(rows: CaseResult[], method: string, k: number): [number, number] | null {
   if (rows.length < 2 || !rows.some((x) => x.label === "reachable")) return null;
   let seed = 20261009;
   const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -151,10 +170,11 @@ function parseArgs(argv: string[]) {
     if (!key.startsWith("--") || !argv[i+1] || argv[i+1]!.startsWith("--")) throw new Error(`Expected --option value, got ${key}`);
     args[key.slice(2)] = argv[++i]!;
   }
-  if (!args.report || !args.labels) throw new Error("Usage: npm run evaluate:benchmark -- --report <scan-report.json> --labels <labels.csv> [--out <metrics.json>] [--k 5]");
+  if (!args.report || !args.labels) throw new Error("Usage: npm run evaluate:benchmark -- --report <scan-report.json> --labels <labels.csv> [--out <metrics.json>] [--k 5] [--external-ranking <case_id,score.csv> --external-name <name>]");
+  if (args["external-name"] && !args["external-ranking"]) throw new Error("--external-name requires --external-ranking.");
   const k = args.k === undefined ? 5 : Number(args.k);
   if (!Number.isInteger(k) || k < 1) throw new Error("--k must be a positive integer.");
-  return {report:resolve(args.report),labels:resolve(args.labels),out:args.out ? resolve(args.out) : undefined,k};
+  return {report:resolve(args.report),labels:resolve(args.labels),out:args.out ? resolve(args.out) : undefined,k,externalRanking:args["external-ranking"] ? resolve(args["external-ranking"]) : undefined,externalName:args["external-name"] ?? "external-baseline"};
 }
 
 async function main() {
@@ -171,29 +191,41 @@ async function main() {
     throw new Error("Scan report lacks PathGuard ranking fields. Regenerate it with a current PathGuard version before evaluating.");
   }
   const labels = parseLabels(await readFile(args.labels,"utf8"));
-  const results = labels.map((label) => ({label, result:scoreFor(label, report.findings ?? [])}));
-  const matched = results.filter((x) => x.result !== null);
-  // Evaluate all labeled reachable/not_reachable cases. If a scan has no matching finding,
-  // score it as zero for every method: retrieval failure is part of end-to-end performance.
-  const evaluable = results.filter((x) => x.label.label !== "unknown").map((x) =>
-    x.result ?? {
-      caseId: x.label.case_id,
-      label: x.label.label as Exclude<Label, "unknown">,
+  const externalScores = args.externalRanking
+    ? parseExternalScores(await readFile(args.externalRanking,"utf8"), labels)
+    : null;
+  const externalName = args.externalName;
+  const results = labels.map((label) => {
+    const result = scoreFor(label, report.findings ?? []);
+    const caseResult: CaseResult = result ?? {
+      caseId: label.case_id,
+      label: label.label as Exclude<Label, "unknown">,
       scores: {"cvss-only": 0, "epss-only": 0, "pathguard-v1": 0}
-    }
-  ) as CaseResult[];
-  const methods: Array<keyof CaseResult["scores"]> = ["cvss-only","epss-only","pathguard-v1"];
+    };
+    if (externalScores) caseResult.scores[externalName] = externalScores.get(label.case_id)!;
+    return {label, result, caseResult};
+  });
+  const matched = results.filter((x) => x.result !== null);
+  // Evaluate all labeled reachable/not_reachable cases. Missing PathGuard findings score zero;
+  // an external baseline must provide a score for every label case, including explicit zeros.
+  const evaluable = results.filter((x) => x.label.label !== "unknown").map((x) => x.caseResult);
+  const methods: string[] = ["cvss-only","epss-only","pathguard-v1"];
+  if (externalScores) {
+    if (methods.includes(externalName)) throw new Error("--external-name must differ from cvss-only, epss-only, and pathguard-v1.");
+    methods.push(externalName);
+  }
   const output = {
     schemaVersion: "1.0",
     evaluator: "PathGuard benchmark evaluator",
     generatedAt: new Date().toISOString(),
-    input: {report:args.report,labels:args.labels,scanGeneratedAt:report.generatedAt ?? null,scanTool:report.tool ?? null,k:args.k},
+    input: {report:args.report,labels:args.labels,externalRanking:args.externalRanking ?? null,externalName:externalScores ? externalName : null,scanGeneratedAt:report.generatedAt ?? null,scanTool:report.tool ?? null,k:args.k},
     protocol: {
       relevantLabel: "reachable",
       negativeLabel: "not_reachable",
       unknownLabel: "unknown (excluded from ranking metrics)",
       unmatchedCasesExcludedFromRankingMetrics: false,
-      unmatchedCasePolicy: "unmatched labeled cases receive score zero for all methods and remain in the ranking denominator",
+      unmatchedCasePolicy: "unmatched labeled cases receive score zero for PathGuard-derived methods and remain in the ranking denominator",
+      externalRankingPolicy: "external score CSV must include every label case; assign zero when the external tool did not flag the case; larger scores rank higher",
       missingCvssOrEpssScore: "0 for baseline ordering only; the report keeps the original value null",
       tieBreak: "case_id ascending",
       bootstrap: "1000 deterministic case-level resamples; percentile 95% interval for nDCG@k"
