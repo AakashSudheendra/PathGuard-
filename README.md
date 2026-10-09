@@ -17,7 +17,7 @@ PathGuard analyzes npm lockfiles, enriches findings with OSV advisory data and E
 - [x] Versioned explainable `pathguard-v1` ranking and CVSS v3.x vector parsing
 - [x] Benchmark evaluator for CVSS-only, EPSS-only, PathGuard, and optional external ranking scores
 - [x] Repository/commit-specific matching, label validation, coverage reporting, and ranking metrics
-- [x] Unlabeled benchmark-candidate manifest generator
+- [x] Unlabeled benchmark-candidate generator that can merge PathGuard and OSV-Scanner discovery
 - [x] CI build, unit tests, and synthetic evaluator/candidate-generator smoke tests
 
 ### Not yet implemented or validated
@@ -70,15 +70,17 @@ The output path is relative to the current directory unless you provide an absol
 - [Research workspace](research/README.md): dataset and evaluation guidance.
 - [Research limitations](docs/RESEARCH_LIMITATIONS.md): scope and claims the current implementation cannot support.
 
-## Prepare benchmark candidates
+## Collect and prepare benchmark candidates
 
-After producing real scan reports with repository URL and commit metadata, generate a candidate CSV for independent review:
+The [public benchmark cohort](research/PUBLIC_BENCHMARK_COHORT.md) documents five pinned repositories and the workflow that scans them with PathGuard and OSV-Scanner v2.6.0. The workflow uploads immutable scan reports, OSV-Scanner outputs, a union candidate CSV, and an OSV-Scanner CVSS baseline score CSV as a GitHub Actions artifact. The initial cohort is a seed convenience sample, not a representative benchmark.
+
+For your own reports, generate a candidate CSV for independent review:
 
 ```powershell
 npm run build:candidates -- --reports-dir ".\research\scan-reports" --out ".\research\benchmark-candidates.csv"
 ```
 
-This command creates one candidate row per package/version/advisory finding, with stable IDs and repository/commit identifiers. It deliberately leaves all labels blank. Reviewers must verify the advisory, vulnerable function, source evidence, and call path, then independently assign labels and record adjudication. Generated candidates are not ground truth and must not be passed to the evaluator until they have been reviewed and completed.
+This command merges package/version/advisory cases discovered by PathGuard and OSV-Scanner, deduplicates matching advisory identifiers, and creates stable IDs. It deliberately leaves all labels blank. Reviewers must verify the advisory, vulnerable function, source evidence, and call path, then independently assign labels and record adjudication. Generated candidates are not ground truth and must not be passed to the evaluator until they have been reviewed and completed. For a candidate CSV produced by the cohort workflow, the accompanying `osv-scanner-scores.csv` uses OSV-Scanner's reported CVSS severity for flagged cases and zero for unflagged cases; this is a detection-plus-severity baseline, not an intrinsic scanner priority score.
 
 ## Benchmark evaluation
 
